@@ -31,9 +31,22 @@ Claude Code 세션에서 두 줄.
 
 ## 수록 플러그인
 
-| 플러그인 | 설명 | 버전 |
-|---|---|---|
-| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 1.0.0 |
+| 플러그인 | 카테고리 | 설명 | 버전 |
+|---|---|---|---|
+| [`cc-roundtable`](plugins/cc-roundtable/) | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
+| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
+
+설치 후 트리거 예시.
+
+```
+# cc-roundtable
+이 결정을 다분야 전문가들과 토론으로 평가해줘
+원탁회의 형식으로 리뷰해줘
+
+# empirical-prompt-tuning
+이 SKILL.md 평가해줘 (서브에이전트 3병렬로)
+프롬프트 재현성 검증해줘
+```
 
 ---
 

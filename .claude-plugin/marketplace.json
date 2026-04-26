@@ -1,16 +1,51 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "gaebalai-marketplace",
-  "description": "gaebalai의 Claude Code 플러그인 마켓플레이스 — 프롬프트 튜닝·평가 자동화 등 메타 도구 모음",
+  "version": "0.2.0",
+  "description": "Claude Code 생산성 플러그인 모음 — by gaebalai",
   "owner": {
     "name": "Jaewoo Kim",
-    "email": "jaewoo.kim2019@gmail.com"
+    "email": "jaewoo@mdrules.dev",
+    "url": "https://github.com/gaebalai"
   },
   "plugins": [
     {
+      "name": "cc-roundtable",
+      "description": "다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리합니다.",
+      "version": "1.0.0",
+      "source": "./plugins/cc-roundtable",
+      "category": "productivity",
+      "tags": [
+        "roundtable",
+        "원탁회의",
+        "korean",
+        "multi-agent",
+        "expert-panel",
+        "debate",
+        "review",
+        "decision-making",
+        "devils-advocate",
+        "critical-thinking"
+      ]
+    },
+    {
       "name": "empirical-prompt-tuning",
+      "description": "사용자가 쓴 Claude Code Skill / SlashCommand / 프롬프트를 별도 AI에 백지 dispatch 시켜 재현성을 객관 측정하는 메타-스킬. 불명확점·재량 보완·재시도를 정성+정량 양면으로 수집해 1회 1테마로 정련.",
+      "version": "0.1.0",
       "source": "./plugins/empirical-prompt-tuning",
-      "description": "사용자가 작성한 Claude Code Skill / SlashCommand / 프롬프트를 별도 AI에 백지 dispatch시켜 재현성을 측정하고, 불명확점·재량 보완·재시도 횟수를 수집해 단계적으로 정련하는 경험 기반 튜닝 루프 스킬",
-      "version": "0.1.0"
+      "category": "productivity",
+      "tags": [
+        "prompt-engineering",
+        "skill-tuning",
+        "empirical",
+        "evaluation",
+        "subagent",
+        "dispatch",
+        "korean",
+        "meta-skill",
+        "reproducibility",
+        "TDD-prompts"
+      ]
     }
   ]
 }

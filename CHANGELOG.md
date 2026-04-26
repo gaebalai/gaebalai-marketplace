@@ -8,10 +8,37 @@
 ## [Unreleased]
 
 ### Planned
-- SKILL.md frontmatter `description` 단축 (트리거 정확도 개선)
 - 자기 적용(dogfooding) 결과 `examples/self-eval-iter-1.md` 추가
-- `plugins/empirical-prompt-tuning/README.md` 추가
-- README에 트러블슈팅 / 제거 / 마켓플레이스 갱신 섹션 추가
+- 기존 `gaebalai/cc-roundtable` 리포의 `.claude-plugin/marketplace.json` 정리 (마켓플레이스 통합 안내)
+
+## [0.2.0] - 2026-04-26
+
+### Added
+- 플러그인 추가: **`cc-roundtable`** (다분야 전문가 토론 스킬)
+  - [plugins/cc-roundtable/skills/start/](plugins/cc-roundtable/skills/start/) — SKILL 본체 + references 3개
+  - 카테고리: `productivity`, 버전 1.0.0
+- 마켓플레이스 매니페스트 형식 정렬 (cc-roundtable 매니페스트와 통일)
+  - top-level `$schema`, `version`, `description` 추가
+  - `owner.url` 추가, 이메일을 `jaewoo@mdrules.dev`로 통일
+  - `plugins[].category`, `plugins[].tags` 추가
+- 마켓플레이스 자산 [assets/logo.png](assets/logo.png) 포함
+
+### Changed
+- `gaebalai/cc-roundtable` 리포에서 운영하던 마켓플레이스를 본 리포로 이전
+  - 사용자가 이미 등록한 마켓플레이스가 있다면 `/plugin marketplace remove gaebalai-marketplace` → `/plugin marketplace add gaebalai/gaebalai-marketplace`로 재등록
+- README 수록 플러그인 표를 2개로 확장, 트리거 예시 추가
+- `plugins/empirical-prompt-tuning/.claude-plugin/plugin.json` 형식을 cc-roundtable plugin.json과 정렬
+  - `author.url`, `license: MIT`, `skills: "./skills/"` 추가
+
+### Migration (기존 사용자용)
+사용자가 `gaebalai/cc-roundtable`로 마켓플레이스를 등록 중이면 다음으로 마이그레이션 권장.
+
+```
+/plugin marketplace remove gaebalai-marketplace
+/plugin marketplace add gaebalai/gaebalai-marketplace
+/plugin install cc-roundtable@gaebalai-marketplace
+/plugin install empirical-prompt-tuning@gaebalai-marketplace
+```
 
 ## [0.1.0] - 2026-04-26
 
@@ -42,5 +69,6 @@
   추후 호환성 패치가 필요할 수 있습니다 (0.1.x 시리즈에서 흡수 예정)
 - 안정화 후 `1.0.0`으로 메이저 승격 예정
 
-[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.2.0
 [0.1.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.1.0
