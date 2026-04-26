@@ -1,6 +1,6 @@
 # gaebalai-marketplace
 
-> Claude Code 플러그인 마켓플레이스. 현재는 `empirical-prompt-tuning` 하나를 호스팅합니다.
+> Claude Code 플러그인 마켓플레이스. 현재 `cc-roundtable`, `empirical-prompt-tuning` 두 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
 
@@ -8,24 +8,30 @@
 
 ## 빠른 시작 (사용자)
 
-Claude Code 세션에서 두 줄.
+Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 플러그인을 설치합니다.
 
 ```
+# 1. 마켓플레이스 등록 (1회)
 /plugin marketplace add gaebalai/gaebalai-marketplace
+
+# 2. 플러그인 설치 (필요한 것만, 또는 전부)
+/plugin install cc-roundtable@gaebalai-marketplace
 /plugin install empirical-prompt-tuning@gaebalai-marketplace
 ```
 
 설치 후 자연어로 트리거됩니다.
 
 ```
-이 SKILL.md 평가해줘 (서브에이전트 3병렬로)
-```
+# cc-roundtable
+이 결정을 다분야 전문가들과 토론으로 평가해줘
+이 사이트를 원탁회의 형식으로 리뷰해줘
 
-```
+# empirical-prompt-tuning
+이 SKILL.md 평가해줘 (서브에이전트 3병렬로)
 ~/.claude/skills/conventional-changelog/SKILL.md 다른 AI한테 돌려봐줘
 ```
 
-> 로컬 개발 중인 마켓플레이스를 그대로 가리키려면 `/plugin marketplace add /Users/gaebalai/cc-workspace/empirical-prompt-tuning` 처럼 절대 경로로도 추가할 수 있습니다.
+> 로컬 개발 중인 마켓플레이스를 그대로 가리키려면 `/plugin marketplace add /Users/gaebalai/cc-workspace/gaebalai-marketplace` 처럼 절대 경로로도 추가할 수 있습니다.
 
 ---
 
@@ -36,17 +42,39 @@ Claude Code 세션에서 두 줄.
 | [`cc-roundtable`](plugins/cc-roundtable/) | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
 | [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
 
-설치 후 트리거 예시.
+---
+
+## cc-roundtable 요점
+
+> 한 명의 시점으로는 보이지 않는 사각지대를, 다분야 전문가 패널의 구조화된 토론으로 메우는 스킬.
+
+**핵심 설계** — 그룹 사고와 의견 수렴 실패를 회피하기 위해 학술적 지견에 근거해 설계됨.
+
+1. **독립 분석 먼저** — 각 전문가가 다른 의견을 보지 않고 병렬로 분석 (Nominal Group Technique)
+2. **반대 의견을 구조적으로 보장** — Devil's Advocate를 패널과 별도로 1명 항상 포함
+3. **반복은 최대 2라운드** — MAD 연구 기준, 3라운드 이상은 사고 퇴화
+4. **소수 의견 보호** — 통합 단계에서 명시적으로 체크
+5. **전문가 패널은 Phase 0에서 확정** — 토론 중간에 추가·교체 금지
+
+**파이프라인**
 
 ```
-# cc-roundtable
-이 결정을 다분야 전문가들과 토론으로 평가해줘
-원탁회의 형식으로 리뷰해줘
-
-# empirical-prompt-tuning
-이 SKILL.md 평가해줘 (서브에이전트 3병렬로)
-프롬프트 재현성 검증해줘
+Phase 0: 의제 분석·전문가 동적 선정 (오케스트레이터)
+   ↓
+Phase 1: 독립 분석 (전문가 병렬, 상호 비공개)
+   ↓
+Phase 2: 구조화된 토론 (대립점 중심, 최대 2라운드)
+   ↓
+Phase 3: 통합·평결 (소수 의견 체크)
+   ↓
+Phase 4: 사용자 보고
 ```
+
+- **패널 크기**는 의제의 도메인 수에 따라 **3–7명 + DA**로 동적 결정.
+- **토론 심도**는 리스크/대립 가능성에 따라 **Quick / Standard / Deep**.
+- 웹사이트, 코드, 사업 전략, 디자인, 조직 설계 등 도메인 무관.
+
+자세한 설계 원칙·전문가 선정 로직·페르소나 템플릿은 [plugins/cc-roundtable/skills/start/SKILL.md](plugins/cc-roundtable/skills/start/SKILL.md)를 참고.
 
 ---
 
@@ -85,9 +113,16 @@ gaebalai-marketplace/                          # 이 리포지터리
 ├── .claude-plugin/
 │   └── marketplace.json                       # 마켓플레이스 매니페스트
 ├── plugins/
+│   ├── cc-roundtable/
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json                    # 플러그인 매니페스트
+│   │   └── skills/
+│   │       └── start/
+│   │           ├── SKILL.md
+│   │           └── references/                # 토론 규칙·전문가 아키타입·출력 포맷
 │   └── empirical-prompt-tuning/
 │       ├── .claude-plugin/
-│       │   └── plugin.json                    # 플러그인 매니페스트
+│       │   └── plugin.json
 │       └── skills/
 │           └── empirical-prompt-tuning/
 │               ├── SKILL.md
@@ -100,7 +135,7 @@ gaebalai-marketplace/                          # 이 리포지터리
 │                   ├── dispatch-prompt-template.md
 │                   ├── report-structure.md
 │                   └── iteration-log-template.md
-├── install.sh                                 # 로컬 개발용 (마켓플레이스 미사용 시)
+├── install.sh                                 # 로컬 개발용 (empirical-prompt-tuning 전용)
 └── README.md
 ```
 
@@ -126,6 +161,8 @@ gaebalai-marketplace/                          # 이 리포지터리
 
 플러그인 시스템 없이 SKILL만 직접 시험하고 싶다면.
 
+### empirical-prompt-tuning
+
 ```bash
 # 심볼릭 링크 (개발용, 실시간 반영)
 bash install.sh
@@ -137,11 +174,21 @@ bash install.sh --copy
 bash install.sh --uninstall
 ```
 
-`install.sh`는 `plugins/empirical-prompt-tuning/skills/empirical-prompt-tuning`을 `~/.claude/skills/empirical-prompt-tuning`으로 링크합니다. 마켓플레이스로 설치한 경우에는 사용할 필요가 없습니다 (플러그인 시스템이 자동 관리).
+`install.sh`는 `plugins/empirical-prompt-tuning/skills/empirical-prompt-tuning`을 `~/.claude/skills/empirical-prompt-tuning`으로 링크합니다.
+
+### cc-roundtable
+
+전용 install 스크립트는 아직 제공하지 않습니다. 직접 링크하려면.
+
+```bash
+ln -s "$(pwd)/plugins/cc-roundtable/skills/start" ~/.claude/skills/cc-roundtable
+```
+
+> 마켓플레이스 경유 설치(`/plugin install cc-roundtable@gaebalai-marketplace`)를 사용하면 플러그인 시스템이 자동 관리하므로 위 작업은 불필요합니다.
 
 ---
 
-## 평가 대상 종류별 사용법
+## 평가 대상 종류별 사용법 (empirical-prompt-tuning)
 
 이 스킬은 SKILL뿐 아니라 다음에도 적용됩니다.
 
@@ -162,7 +209,8 @@ bash install.sh --uninstall
 # 마켓플레이스 정의가 바뀌면 (소유자가 새 플러그인을 추가했거나 plugin.json을 갱신했을 때)
 /plugin marketplace update gaebalai-marketplace
 
-# 플러그인만 제거 (마켓플레이스는 유지)
+# 플러그인 개별 제거 (마켓플레이스는 유지)
+/plugin uninstall cc-roundtable@gaebalai-marketplace
 /plugin uninstall empirical-prompt-tuning@gaebalai-marketplace
 
 # 마켓플레이스 자체 제거
@@ -173,7 +221,7 @@ bash install.sh --uninstall
 
 ---
 
-## 트러블슈팅
+## 트러블슈팅 (empirical-prompt-tuning)
 
 | 증상 | 원인 | 대처 |
 |---|---|---|
