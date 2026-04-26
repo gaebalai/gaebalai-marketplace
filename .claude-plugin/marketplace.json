@@ -1,0 +1,16 @@
+{
+  "name": "gaebalai-marketplace",
+  "description": "gaebalai의 Claude Code 플러그인 마켓플레이스 — 프롬프트 튜닝·평가 자동화 등 메타 도구 모음",
+  "owner": {
+    "name": "Jaewoo Kim",
+    "email": "jaewoo.kim2019@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "empirical-prompt-tuning",
+      "source": "./plugins/empirical-prompt-tuning",
+      "description": "사용자가 작성한 Claude Code Skill / SlashCommand / 프롬프트를 별도 AI에 백지 dispatch시켜 재현성을 측정하고, 불명확점·재량 보완·재시도 횟수를 수집해 단계적으로 정련하는 경험 기반 튜닝 루프 스킬",
+      "version": "0.1.0"
+    }
+  ]
+}
