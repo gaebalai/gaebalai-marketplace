@@ -1,40 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+meeting_rec/
+
+# Node.js
+node_modules/
+
 # macOS
 .DS_Store
-.AppleDouble
-.LSOverride
-._*
 
-# 에디터 / IDE
+# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-.cursor/
 
-# Claude Code 로컬 산출물 (리포 외부에 두는 게 원칙이지만, 우발 커밋 방지)
-.claude/
-eval-logs/
-**/eval-logs/
-
-# 임시 / 백업
-*.bak
-*.tmp
+# Build artifacts
+out/
 *.log
 
-# 환경변수 / 시크릿
-.env
-.env.local
-.env.*.local
-
-# Node (혹시 이후 헬퍼 스크립트가 추가될 경우 대비)
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Python (혹시 평가 분석 스크립트가 추가될 경우 대비)
-__pycache__/
-*.py[cod]
-.venv/
-venv/
+# Reference / 참고 자료 (저작권 보존을 위해 git 추적 제외)
+meeting_highlight_pipeline_ko.md

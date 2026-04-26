@@ -1,0 +1,27 @@
+{
+  "name": "meeting-highlight-remotion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "cc-meeting-highlight Phase 6 Remotion 4.x template (Highlight60 composition with Korean captions)",
+  "scripts": {
+    "studio": "remotion studio",
+    "build": "remotion render Highlight60 ../out/highlight_60s.mp4 --props=../transcribe/highlights.json --concurrency=4",
+    "build:fast": "remotion render Highlight60 ../out/highlight_60s.mp4 --props=../transcribe/highlights.json --concurrency=8 --jpeg-quality=80"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/media-parser": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

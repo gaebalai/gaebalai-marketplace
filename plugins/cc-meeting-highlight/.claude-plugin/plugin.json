@@ -1,0 +1,13 @@
+{
+  "name": "cc-meeting-highlight",
+  "description": "회의 녹화 mp4를 60초 하이라이트 영상으로 자동 압축하는 macOS 전용 파이프라인. mlx-whisper로 받아쓰기 → Claude Code LLM으로 토픽·하이라이트 선정 → Remotion으로 자막 합성. Apple Silicon 전용.",
+  "version": "0.1.0",
+  "author": {
+    "name": "gaebalai",
+    "url": "https://github.com/gaebalai"
+  },
+  "license": "MIT",
+  "platform": "darwin-arm64",
+  "skills": "./skills/",
+  "commands": "./commands/"
+}

@@ -1,6 +1,6 @@
 # gaebalai-marketplace
 
-> Claude Code 플러그인 마켓플레이스. 현재 `cc-roundtable`, `empirical-prompt-tuning` 두 플러그인을 호스팅합니다.
+> Claude Code 플러그인 마켓플레이스. 현재 `cc-meeting-highlight`, `cc-roundtable`, `empirical-prompt-tuning` 세 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
 
@@ -15,13 +15,18 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 /plugin marketplace add gaebalai/gaebalai-marketplace
 
 # 2. 플러그인 설치 (필요한 것만, 또는 전부)
+/plugin install cc-meeting-highlight@gaebalai-marketplace   # macOS Apple Silicon 전용
 /plugin install cc-roundtable@gaebalai-marketplace
 /plugin install empirical-prompt-tuning@gaebalai-marketplace
 ```
 
-설치 후 자연어로 트리거됩니다.
+설치 후 자연어 또는 슬래시 명령어로 트리거됩니다.
 
 ```
+# cc-meeting-highlight (macOS 전용)
+/meeting-highlight
+이 회의 녹화 60초 하이라이트로 만들어줘
+
 # cc-roundtable
 이 결정을 다분야 전문가들과 토론으로 평가해줘
 이 사이트를 원탁회의 형식으로 리뷰해줘
@@ -37,10 +42,41 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 
 ## 수록 플러그인
 
-| 플러그인 | 카테고리 | 설명 | 버전 |
-|---|---|---|---|
-| [`cc-roundtable`](plugins/cc-roundtable/) | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
-| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
+| 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 |
+|---|---|---|---|---|
+| [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.0 |
+| [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
+| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
+
+---
+
+## cc-meeting-highlight 요점
+
+> "녹화 안 보는 문제"를 자동화로 해결 — 1시간 회의 mp4를 60초 자막 영상으로 압축.
+
+**파이프라인**: 7-Phase, 첫 실행 10-15분 / 두 번째부터 2-5분 (M3 Mac 24GB 기준).
+
+```
+Phase 0  symlink (한글·일본어 파일명 ASCII화)              [scripts/00]
+Phase 1  음성 추출 (16kHz mono WAV)                        [scripts/10]
+Phase 2  받아쓰기 (mlx-whisper, word-level timestamps)     [scripts/20]
+Phase 3  토픽 추출 + 시각 매칭 (LLM)                       [skills/topics-extractor]
+Phase 4  60초 하이라이트 선정 + 자막 작성 (LLM)             [skills/highlights-selector]
+Phase 5  클립 잘라내기 (CFR 30fps 재인코딩)                 [scripts/50]
+Phase 6  Remotion 4.x 렌더링 (Noto Sans KR 한글 자막)      [assets/remotion/]
+```
+
+**한국 환경 기본 설정** (이 플러그인이 자동 적용):
+
+- mlx-whisper `language="ko"` 명시 (자동 감지가 일본어로 흘러가는 문제 회피)
+- INITIAL_PROMPT에 한국 회사 자주 쓰는 용어 (OKR, KPI, MAU, PM, CTO 등)
+- NFD/NFC 정규화 차이를 symlink 레이어로 흡수 (한글 파일명 안전)
+- Remotion에서 Noto Sans KR + `wordBreak: keep-all` 적용
+- 자막 한국어 길이 가이드 (caption 18자, subCaption 35자)
+
+**사전 요건**: macOS 14+, Apple Silicon, 16GB+ RAM, Python 3.11(필수, 3.14는 mlx-whisper ImportError), Node 18+, `brew install ffmpeg jq uv node`.
+
+자세한 절차·트러블슈팅·자산 부트스트랩 방법은 [plugins/cc-meeting-highlight/README.md](plugins/cc-meeting-highlight/README.md)를 참고.
 
 ---
 
@@ -113,16 +149,24 @@ gaebalai-marketplace/                          # 이 리포지터리
 ├── .claude-plugin/
 │   └── marketplace.json                       # 마켓플레이스 매니페스트
 ├── plugins/
+│   ├── cc-meeting-highlight/                  # macOS Apple Silicon 전용
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── commands/meeting-highlight.md      # /meeting-highlight 슬래시 명령어
+│   │   ├── skills/
+│   │   │   ├── topics-extractor/SKILL.md      # Phase 3
+│   │   │   └── highlights-selector/SKILL.md   # Phase 4
+│   │   └── assets/
+│   │       ├── scripts/                       # Phase 0·1·2·5 + bootstrap.sh
+│   │       ├── remotion/                      # Phase 6 Remotion 4.x 템플릿
+│   │       └── schemas/                       # topics / highlights JSON Schema
 │   ├── cc-roundtable/
-│   │   ├── .claude-plugin/
-│   │   │   └── plugin.json                    # 플러그인 매니페스트
+│   │   ├── .claude-plugin/plugin.json
 │   │   └── skills/
 │   │       └── start/
 │   │           ├── SKILL.md
 │   │           └── references/                # 토론 규칙·전문가 아키타입·출력 포맷
 │   └── empirical-prompt-tuning/
-│       ├── .claude-plugin/
-│       │   └── plugin.json
+│       ├── .claude-plugin/plugin.json
 │       └── skills/
 │           └── empirical-prompt-tuning/
 │               ├── SKILL.md
@@ -184,7 +228,16 @@ bash install.sh --uninstall
 ln -s "$(pwd)/plugins/cc-roundtable/skills/start" ~/.claude/skills/cc-roundtable
 ```
 
-> 마켓플레이스 경유 설치(`/plugin install cc-roundtable@gaebalai-marketplace`)를 사용하면 플러그인 시스템이 자동 관리하므로 위 작업은 불필요합니다.
+### cc-meeting-highlight
+
+macOS Apple Silicon 전용. 사용자 프로젝트 루트에서 부트스트랩 스크립트를 실행하면 `meeting_rec/` 트리, Python 3.11 venv, Remotion 의존성까지 한 번에 셋업됩니다.
+
+```bash
+cd <your-project>
+bash <repo>/plugins/cc-meeting-highlight/assets/scripts/bootstrap.sh
+```
+
+> 마켓플레이스 경유 설치(`/plugin install <name>@gaebalai-marketplace`)를 사용하면 SKILL/Command는 자동 관리됩니다. cc-meeting-highlight의 경우 `/meeting-highlight` 슬래시 명령어가 부트스트랩까지 안내합니다.
 
 ---
 
@@ -210,6 +263,7 @@ ln -s "$(pwd)/plugins/cc-roundtable/skills/start" ~/.claude/skills/cc-roundtable
 /plugin marketplace update gaebalai-marketplace
 
 # 플러그인 개별 제거 (마켓플레이스는 유지)
+/plugin uninstall cc-meeting-highlight@gaebalai-marketplace
 /plugin uninstall cc-roundtable@gaebalai-marketplace
 /plugin uninstall empirical-prompt-tuning@gaebalai-marketplace
 
