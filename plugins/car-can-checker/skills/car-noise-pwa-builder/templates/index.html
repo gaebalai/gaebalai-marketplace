@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1729">
+<title>{{PROJECT_NAME}}</title>
+<link rel="manifest" href="manifest.webmanifest">
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0f1729; color: #eaeefb; font-family: -apple-system, system-ui, sans-serif; }
+  header { display: flex; gap: 8px; padding: 8px; background: #1a2440; }
+  header button { padding: 6px 10px; border: 0; border-radius: 6px; background: #3a4a7a; color: #fff; }
+  #spec { width: 100%; height: 240px; background: #000; display: block; }
+  .panel { padding: 12px; border-bottom: 1px solid #1f2a4a; }
+  .panel h3 { margin: 0 0 6px; font-size: 13px; opacity: 0.7; font-weight: 500; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .big { font-size: 28px; font-weight: 700; }
+  .label { color: #ff4757; }
+  #fft { width: 100%; height: 100px; background: #000; display: block; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #2a3760; font-size: 12px; }
+  .rec { background: #e74c3c !important; }
+</style>
+</head>
+<body>
+<header>
+  <button id="btnRec">● 녹음</button>
+  <button id="btnExport">ZIP 내보내기</button>
+  <span class="pill" id="status">대기</span>
+  <span class="pill" id="wsStatus">WS:-</span>
+</header>
+
+<canvas id="spec"></canvas>
+
+<div class="panel">
+  <h3>스펙트럼 분석</h3>
+  <canvas id="fft"></canvas>
+  <div>피크: <span id="peak" class="label">-- Hz</span></div>
+</div>
+
+<div class="panel grid">
+  <div>
+    <h3>엔진 회전수 (RPM)</h3>
+    <div class="big" id="rpm">--</div>
+  </div>
+  <div>
+    <h3>속도</h3>
+    <div class="big" id="speed">-- km/h</div>
+  </div>
+  <div>
+    <h3>조향각</h3>
+    <div class="big" id="steering">--°</div>
+  </div>
+  <div>
+    <h3>기어</h3>
+    <div class="big" id="gear">--</div>
+  </div>
+</div>
+
+<script>
+window.PI_HOST = "{{PI_HOST}}";
+window.SIGNAL_MAPPING = {{SIGNAL_MAPPING_JSON}};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="app.js"></script>
+<script>
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+</script>
+</body>
+</html>

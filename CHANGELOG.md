@@ -11,6 +11,24 @@
 - 자기 적용(dogfooding) 결과 `examples/self-eval-iter-1.md` 추가
 - 기존 `gaebalai/cc-roundtable` 리포의 `.claude-plugin/marketplace.json` 정리 (마켓플레이스 통합 안내)
 - cc-meeting-highlight 실사용 회의 1건으로 dogfooding (mlx-whisper 모델 변형, 자막 길이 가이드 검증)
+- car-can-checker 실차량 1건으로 dogfooding (CAN 신호 후보 정확도, PWA 마이크 ZIP 워크플로우, 이상음 휴리스틱 검증)
+
+## [0.4.0] - 2026-04-27
+
+### Added
+- 플러그인 추가: **`car-can-checker`** (자동차 OBD2/CAN 진단 풀스택, 카테고리: `automotive`)
+  - 에이전트 [`car-can-orchestrator`](plugins/car-can-checker/agents/car-can-orchestrator.md) — STEP A~D 풀 파이프라인 자동 분기
+  - 스킬 [`raspi-can-bootstrap`](plugins/car-can-checker/skills/raspi-can-bootstrap/SKILL.md) — Pi 4/5/Zero 2W에 Node 18 + Claude Code + python-can + USB-CAN udev 규칙 부트스트랩
+  - 스킬 [`can-signal-hunter`](plugins/car-can-checker/skills/can-signal-hunter/SKILL.md) — `.asc/.log/.blf/.csv` CAN 로그에서 RPM/차속/조향각/기어 자동 추정 + 4단 검증 패널 PNG + DBC 초안
+  - 스킬 [`car-noise-pwa-builder`](plugins/car-can-checker/skills/car-noise-pwa-builder/SKILL.md) — 마이크 FFT + CAN WebSocket PWA 자동 스캐폴딩 (HTTPS, IndexedDB, Service Worker, JSZip)
+  - 스킬 [`car-noise-report`](plugins/car-can-checker/skills/car-noise-report/SKILL.md) — PWA의 녹음 ZIP을 받아 RMS 급증·RPM 공진 피크·노면 무관 노이즈 분리 리포트(MD + PNG)
+  - 플러그인 매니페스트 [plugin.json](plugins/car-can-checker/.claude-plugin/plugin.json), 플러그인 README
+- 보안 설계: ECU 쓰기 명령 미구현/차단, 차량 연결 Pi의 인터넷 노출 금지, mkcert·sudo·신호 매핑 확정에 사용자 승인 필수, 신뢰도 95% 미만 신호 PWA 자동 반영 차단
+
+### Changed
+- 마켓플레이스 버전 0.3.0 → **0.4.0**
+- 수록 플러그인 3개 → **4개**
+- 마켓플레이스 카테고리에 `automotive` 신설 (기존 `productivity` 외)
 
 ## [0.3.0] - 2026-04-27
 
@@ -87,7 +105,8 @@
   추후 호환성 패치가 필요할 수 있습니다 (0.1.x 시리즈에서 흡수 예정)
 - 안정화 후 `1.0.0`으로 메이저 승격 예정
 
-[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.0
 [0.3.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.3.0
 [0.2.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.2.0
 [0.1.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.1.0

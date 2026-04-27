@@ -1,6 +1,6 @@
 # gaebalai-marketplace
 
-> Claude Code 플러그인 마켓플레이스. 현재 `cc-meeting-highlight`, `cc-roundtable`, `empirical-prompt-tuning` 세 플러그인을 호스팅합니다.
+> Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-meeting-highlight`, `cc-roundtable`, `empirical-prompt-tuning` 네 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
 
@@ -15,6 +15,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 /plugin marketplace add gaebalai/gaebalai-marketplace
 
 # 2. 플러그인 설치 (필요한 것만, 또는 전부)
+/plugin install car-can-checker@gaebalai-marketplace
 /plugin install cc-meeting-highlight@gaebalai-marketplace   # macOS Apple Silicon 전용
 /plugin install cc-roundtable@gaebalai-marketplace
 /plugin install empirical-prompt-tuning@gaebalai-marketplace
@@ -23,6 +24,11 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 설치 후 자연어 또는 슬래시 명령어로 트리거됩니다.
 
 ```
+# car-can-checker
+차 한번 굴리고 받은 데이터 분석해줘
+이 candump 로그에서 RPM ID 찾아줘
+차량 진단 PWA 만들어줘
+
 # cc-meeting-highlight (macOS 전용)
 /meeting-highlight
 이 회의 녹화 60초 하이라이트로 만들어줘
@@ -44,9 +50,33 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 
 | 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 |
 |---|---|---|---|---|
+| [`car-can-checker`](plugins/car-can-checker/) | 모든 플랫폼 + Raspberry Pi | automotive | 자동차 OBD2/CAN 진단 풀스택 — Pi 부트스트랩 → 신호 역엔지니어링 → 마이크 + CAN PWA → 이상음 리포트 | 0.1.0 |
 | [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.0 |
 | [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
 | [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
+
+---
+
+## car-can-checker 요점
+
+> 자동차 OBD2/CAN 진단을 처음부터 끝까지 자동화. **읽기 전용** 파이프라인 (ECU 쓰기 차단).
+
+**구성**: 4개 스킬 + 1개 오케스트레이터 에이전트.
+
+```
+STEP A  raspi-can-bootstrap     → Pi에 Node 18 + Claude Code + python-can + udev 규칙 설치
+STEP B  can-signal-hunter       → CAN 로그(.asc/.log/.blf/.csv)에서 RPM·차속·조향각·기어 ID/바이트 자동 추정
+                                  + 4단 검증 패널 PNG + DBC 초안
+STEP C  car-noise-pwa-builder   → 마이크 FFT 스펙트로그램 + WebSocket CAN 시각화 PWA 자동 스캐폴딩
+                                  (HTTPS via mkcert, Service Worker, IndexedDB, JSZip)
+STEP D  car-noise-report        → PWA가 만든 ZIP에서 RMS 급증·RPM 공진 피크·노면 무관 노이즈 자동 분리 리포트
+
+car-can-orchestrator (agent)    → 사용자가 가진 자산을 보고 STEP A~D 중 어디부터 시작할지 자동 분기
+```
+
+**보안 원칙**: ECU 쓰기 명령 미구현 / 차량 연결 Pi의 인터넷 노출 금지 / mkcert·sudo·신호 매핑 확정은 사용자 승인 필수 / 신뢰도 95% 미만 신호는 PWA에 자동 반영 안 함.
+
+자세한 실행 흐름·결과물 구조·하드웨어 가이드는 [plugins/car-can-checker/README.md](plugins/car-can-checker/README.md)를 참고.
 
 ---
 
@@ -149,6 +179,15 @@ gaebalai-marketplace/                          # 이 리포지터리
 ├── .claude-plugin/
 │   └── marketplace.json                       # 마켓플레이스 매니페스트
 ├── plugins/
+│   ├── car-can-checker/                       # 자동차 OBD2/CAN 진단 풀스택
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── README.md
+│   │   ├── agents/car-can-orchestrator.md     # 4개 스킬 오케스트레이터
+│   │   └── skills/
+│   │       ├── raspi-can-bootstrap/           # STEP A
+│   │       ├── can-signal-hunter/             # STEP B
+│   │       ├── car-noise-pwa-builder/         # STEP C
+│   │       └── car-noise-report/              # STEP D
 │   ├── cc-meeting-highlight/                  # macOS Apple Silicon 전용
 │   │   ├── .claude-plugin/plugin.json
 │   │   ├── commands/meeting-highlight.md      # /meeting-highlight 슬래시 명령어
@@ -263,6 +302,7 @@ bash <repo>/plugins/cc-meeting-highlight/assets/scripts/bootstrap.sh
 /plugin marketplace update gaebalai-marketplace
 
 # 플러그인 개별 제거 (마켓플레이스는 유지)
+/plugin uninstall car-can-checker@gaebalai-marketplace
 /plugin uninstall cc-meeting-highlight@gaebalai-marketplace
 /plugin uninstall cc-roundtable@gaebalai-marketplace
 /plugin uninstall empirical-prompt-tuning@gaebalai-marketplace
