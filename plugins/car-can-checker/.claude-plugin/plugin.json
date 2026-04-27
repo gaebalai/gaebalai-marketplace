@@ -1,7 +1,7 @@
 {
   "name": "car-can-checker",
   "description": "자동차 OBD2/CAN 진단 풀스택 파이프라인. 라즈베리파이 부트스트랩 → CAN 로그에서 RPM·차속·조향각·기어 신호 자동 역엔지니어링 → 마이크 FFT + CAN 동시 기록 PWA 스캐폴딩 → 녹음 ZIP의 이상음 후보 자동 탐지 리포트까지. 4개 스킬 + 1개 오케스트레이터 에이전트.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "gaebalai",
     "url": "https://github.com/gaebalai"

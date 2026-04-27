@@ -1,7 +1,7 @@
 {
   "name": "empirical-prompt-tuning",
   "description": "프롬프트 재현성을 별도 AI dispatch로 객관 측정하고 1회 1테마 수정 루프로 정련하는 메타-스킬",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "gaebalai",
     "url": "https://github.com/gaebalai"
