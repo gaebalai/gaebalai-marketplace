@@ -4,10 +4,12 @@
   "include-component-in-tag": false,
   "include-v-in-tag": true,
   "changelog-path": "CHANGELOG.md",
+  "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
   "packages": {
     ".": {
       "package-name": "gaebalai-marketplace",
       "release-type": "simple",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
       "extra-files": [
         {
           "type": "json",
@@ -20,6 +22,7 @@
       "package-name": "car-can-checker",
       "release-type": "simple",
       "component": "car-can-checker",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
       "extra-files": [
         {
           "type": "json",
@@ -32,6 +35,7 @@
       "package-name": "cc-meeting-highlight",
       "release-type": "simple",
       "component": "cc-meeting-highlight",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
       "extra-files": [
         {
           "type": "json",
@@ -44,6 +48,7 @@
       "package-name": "cc-roundtable",
       "release-type": "simple",
       "component": "cc-roundtable",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
       "extra-files": [
         {
           "type": "json",
@@ -56,6 +61,7 @@
       "package-name": "empirical-prompt-tuning",
       "release-type": "simple",
       "component": "empirical-prompt-tuning",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
       "extra-files": [
         {
           "type": "json",
