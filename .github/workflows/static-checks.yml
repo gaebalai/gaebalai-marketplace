@@ -1,0 +1,123 @@
+name: static-checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install jq
+        run: sudo apt-get update -y && sudo apt-get install -y jq
+
+      - name: JSON validation (marketplace + plugin manifests + schemas)
+        run: |
+          set -e
+          echo "::group::marketplace.json"
+          jq empty .claude-plugin/marketplace.json
+          echo "::endgroup::"
+
+          for f in $(find plugins -name "plugin.json"); do
+            echo "::group::$f"
+            jq empty "$f"
+            echo "::endgroup::"
+          done
+
+          for f in $(find plugins -name "*.schema.json"); do
+            echo "::group::$f"
+            jq empty "$f"
+            echo "::endgroup::"
+          done
+
+      - name: Bash syntax (bash -n)
+        run: |
+          set -e
+          for f in $(find . -name "*.sh" -not -path "./node_modules/*"); do
+            echo "::group::$f"
+            bash -n "$f"
+            echo "::endgroup::"
+          done
+
+      - name: Python syntax (py_compile)
+        run: |
+          set -e
+          for f in $(find plugins -name "*.py"); do
+            echo "::group::$f"
+            python3 -m py_compile "$f"
+            echo "::endgroup::"
+          done
+
+      - name: Python syntax with token substitution (PWA pi_server.py)
+        run: |
+          set -e
+          for f in $(grep -rl '{{' plugins --include='*.py'); do
+            echo "::group::$f (after token sub)"
+            sed 's/{{SIGNAL_MAPPING_JSON}}/{}/g; s/{{PROJECT_NAME}}/test/g; s/{{PI_HOST}}/test/g' "$f" > /tmp/_check.py
+            python3 -m py_compile /tmp/_check.py
+            echo "::endgroup::"
+          done
+
+      - name: Manifest token substitution (PWA manifest.webmanifest)
+        run: |
+          set -e
+          for f in $(grep -rl '{{' plugins --include='*.webmanifest'); do
+            echo "::group::$f (after token sub)"
+            sed 's/{{PROJECT_NAME}}/test/g' "$f" | jq empty
+            echo "::endgroup::"
+          done
+
+      - name: JavaScript syntax (node --check)
+        run: |
+          set -e
+          for f in $(find plugins -name "*.js" -not -path "*/node_modules/*"); do
+            echo "::group::$f"
+            node --check "$f" || echo "::warning::$f has syntax issues (may use template tokens)"
+            echo "::endgroup::"
+          done
+
+      - name: SKILL/agent frontmatter sanity (name + description present)
+        run: |
+          set -e
+          missing=0
+          for f in $(find plugins -name "SKILL.md" -o -name "*.md" -path "*/agents/*"); do
+            if ! head -20 "$f" | grep -q '^name:' || ! head -20 "$f" | grep -q '^description:'; then
+              echo "::error file=$f::missing name/description in frontmatter"
+              missing=$((missing + 1))
+            fi
+          done
+          if [ "$missing" -gt 0 ]; then
+            exit 1
+          fi
+          echo "All SKILL/agent files have frontmatter"
+
+      - name: ECU write guard (read-only invariant for car-can-checker)
+        run: |
+          set -e
+          if grep -rnE 'bus\.send\(|UDS_write|diagnostic_write|write_did' plugins/car-can-checker --include="*.py"; then
+            echo "::error::car-can-checker is supposed to be read-only — bus.send() or UDS write found"
+            exit 1
+          fi
+          echo "car-can-checker: read-only invariant holds"
+
+      - name: TypeScript compile (Remotion templates)
+        run: |
+          set -e
+          if [ -f plugins/cc-meeting-highlight/assets/remotion/tsconfig.json ]; then
+            cd plugins/cc-meeting-highlight/assets/remotion
+            npx --yes typescript@5.4 tsc --noEmit
+          fi

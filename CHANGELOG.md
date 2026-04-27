@@ -11,8 +11,38 @@
 - 자기 적용(dogfooding) 결과 `examples/self-eval-iter-1.md` 추가
 - 기존 `gaebalai/cc-roundtable` 리포의 `.claude-plugin/marketplace.json` 정리 (마켓플레이스 통합 안내)
 - cc-meeting-highlight 실사용 회의 1건으로 dogfooding (mlx-whisper 모델 변형, 자막 길이 가이드 검증)
-- car-can-checker 실차량 1건으로 dogfooding (CAN 신호 후보 정확도, PWA 마이크 ZIP 워크플로우, 이상음 휴리스틱 검증)
-- car-noise-report v0.2: 5종 휴리스틱 분류 (회전성/노면성/공진/충격/조향계통), RPM-주파수·속도-주파수 상관 산출, 의심 구간 확대 PNG
+- car-can-checker 실차량 1건으로 dogfooding (5종 휴리스틱 임계값 보정, RPM 락 대역 검출 정확도)
+
+## [0.5.0] - 2026-04-27
+
+마켓플레이스 인프라 정비 + `car-can-checker` v0.2.0 (5종 휴리스틱 분류 구현).
+
+### Added
+- **CI 워크플로우** [.github/workflows/static-checks.yml](.github/workflows/static-checks.yml) — push/PR마다 자동 검증:
+  - JSON 검증 (marketplace.json, plugin.json, schemas)
+  - Bash 문법 (`bash -n`)
+  - Python 문법 (`py_compile`, 토큰 치환 후 포함)
+  - Webmanifest 검증 (토큰 치환 후)
+  - JS 문법 (`node --check`)
+  - SKILL/agent frontmatter 존재 검증 (`name:` + `description:`)
+  - **`car-can-checker` 읽기 전용 invariant 가드** — `bus.send()` 등이 들어오면 CI fail
+  - Remotion TypeScript 컴파일 (`tsc --noEmit`)
+- **`examples/`** 디렉터리 — 4개 플러그인 사용 예시 (트리거 표현, 환경변수, 보안 체크리스트, 트러블슈팅)
+- **루트 README 배지** — release / plugin count / license / CI status (shields.io)
+
+### Changed (car-can-checker v0.1.1 → v0.2.0)
+- **`car-noise-report` v0.2** — SKILL.md 약속이 코드로 구현됨:
+  - 5종 패턴 자동 분류: `engine_order` / `road` / `rpm_locked` / `shock` / `steering` (+`unknown`)
+  - 분류 우선순위: `rpm_locked` > `steering` > `shock` > `engine_order` > `road` > `unknown`
+  - 임계값 5개를 [noise_report.py:22-28](plugins/car-can-checker/skills/car-noise-report/scripts/noise_report.py)에 상수로 노출 (도메인 보정 가능)
+  - `correlations.csv` — RPM↔peak / speed↔peak / RPM↔RMS / speed↔RMS Pearson r
+  - `candidate_<1..5>.png` — spike 상위 5건 ±2초 확대 (스펙트로그램+RPM+RMS+분류 라벨)
+  - `INDEX.md`에 take별 분류 카운트 + RPM 락 대역 명시
+- **`app.js` IndexedDB race 수정** — `dbReq.result` 즉시 접근 패턴을 `dbReady` Promise 패턴으로 교체. 첫 페이지 로드 직후 녹음 시도해도 안전
+- **마켓플레이스 0.4.1 → 0.5.0** — minor 버전 (CI/examples는 비기능 인프라이지만 사용자 발견성 영향)
+
+### Fixed
+- 모든 정적 검증 통과 (이번 변경분 포함). CI에서 자동 회귀 방지
 
 ## [0.4.1] - 2026-04-27
 
@@ -136,7 +166,8 @@
   추후 호환성 패치가 필요할 수 있습니다 (0.1.x 시리즈에서 흡수 예정)
 - 안정화 후 `1.0.0`으로 메이저 승격 예정
 
-[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.5.0
 [0.4.1]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.1
 [0.4.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.0
 [0.3.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.3.0

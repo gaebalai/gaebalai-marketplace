@@ -126,16 +126,20 @@ $("btnRec").onclick = async () => {
 };
 
 // ---------- IndexedDB ----------
-const dbReq = indexedDB.open("car-noise-takes", 1);
-dbReq.onupgradeneeded = () => dbReq.result.createObjectStore("takes", { keyPath: "id", autoIncrement: true });
-function db() { return dbReq.result; }
+const dbReady = new Promise((resolve, reject) => {
+  const req = indexedDB.open("car-noise-takes", 1);
+  req.onupgradeneeded = () => req.result.createObjectStore("takes", { keyPath: "id", autoIncrement: true });
+  req.onsuccess = () => resolve(req.result);
+  req.onerror = () => reject(req.error);
+});
 
 async function persistTake() {
   await new Promise(r => recorder.onstop = r);
   const blob = new Blob(chunks, { type: "audio/webm" });
   const take = { ts: Date.now(), audio: blob, can: canLog };
+  const db = await dbReady;
   await new Promise((resolve, reject) => {
-    const tx = db().transaction("takes", "readwrite");
+    const tx = db.transaction("takes", "readwrite");
     tx.objectStore("takes").add(take).onsuccess = resolve;
     tx.onerror = () => reject(tx.error);
   });
@@ -144,8 +148,9 @@ async function persistTake() {
 
 // ---------- ZIP export ----------
 $("btnExport").onclick = async () => {
+  const db = await dbReady;
   const takes = await new Promise((res) => {
-    const tx = db().transaction("takes", "readonly");
+    const tx = db.transaction("takes", "readonly");
     const r = tx.objectStore("takes").getAll();
     r.onsuccess = () => res(r.result);
   });

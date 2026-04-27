@@ -1,5 +1,10 @@
 # gaebalai-marketplace
 
+[![Latest release](https://img.shields.io/github/v/release/gaebalai/gaebalai-marketplace?label=release)](https://github.com/gaebalai/gaebalai-marketplace/releases/latest)
+[![Plugins](https://img.shields.io/badge/plugins-4-blue)](#수록-플러그인)
+[![License](https://img.shields.io/github/license/gaebalai/gaebalai-marketplace)](LICENSE)
+[![CI](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml/badge.svg)](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml)
+
 > Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-meeting-highlight`, `cc-roundtable`, `empirical-prompt-tuning` 네 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
@@ -48,12 +53,14 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 
 ## 수록 플러그인
 
-| 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 |
-|---|---|---|---|---|
-| [`car-can-checker`](plugins/car-can-checker/) | 모든 플랫폼 + Raspberry Pi | automotive | 자동차 OBD2/CAN 진단 풀스택 — Pi 부트스트랩 → 신호 역엔지니어링 → 마이크 + CAN PWA → 이상음 리포트 | 0.1.0 |
-| [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.0 |
-| [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 |
-| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 |
+| 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 | 예시 |
+|---|---|---|---|---|---|
+| [`car-can-checker`](plugins/car-can-checker/) | 모든 플랫폼 + Raspberry Pi | automotive | 자동차 OBD2/CAN 진단 풀스택 — Pi 부트스트랩 → 신호 역엔지니어링(+DBC 자동) → 마이크 + CAN PWA → 5종 휴리스틱 이상음 리포트 | 0.2.0 | [예시](examples/car-can-checker.md) |
+| [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.0 | [예시](examples/cc-meeting-highlight.md) |
+| [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 | [예시](examples/cc-roundtable.md) |
+| [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 | [예시](examples/empirical-prompt-tuning.md) |
+
+> 더 많은 트리거 예시는 [examples/](examples/README.md)를 참고.
 
 ---
 

@@ -50,28 +50,33 @@ ffmpeg -i audio.webm -ac 1 -ar 16000 audio.wav
 
 오디오 프레임마다 가장 가까운 시각의 RPM/속도/기어를 매핑한다 (`np.searchsorted`).
 
-### STEP 4. 이상음 후보 탐지 (현재 v0.1 구현)
+### STEP 4. 이상음 후보 탐지 — 5종 휴리스틱 분류 (v0.2)
 
-현재 버전은 **단순 spike 탐지** 수준입니다. RMS 에너지 상위 1% 시점을 추출해 그 시점의 RPM/속도/기어/dominant 주파수를 메타데이터로 표기합니다. 사람이 표를 보고 다음 패턴을 직접 판정해야 합니다.
+RMS 에너지 상위 1% 시점을 spike로 검출하고, 각 spike를 다음 5종 + 1(unknown)로 자동 분류합니다.
 
-| 패턴 | 의미 |
-|---|---|
-| RPM↑에 따라 피크주파수 비례 증가 | 엔진 회전성(차수성) — 정상 가능성 |
-| 속도↑에 따라 피크주파수 비례 증가 | 노면/타이어성 |
-| 특정 RPM 대역에서만 피크 | 공진 / 부품 결함 의심 |
-| RMS 급증 + RPM 무관 | 충격 / 접촉음 의심 |
-| 조향각 변화 시 발생 | 서스펜션 / 조향 계통 의심 |
+| 분류 | 판정 조건 | 의미 |
+|---|---|---|
+| `engine_order` | RPM ↔ peak 주파수 Pearson r > 0.7 | 엔진 회전성(차수성) — 정상 가능성 높음 |
+| `road` | speed ↔ peak 주파수 Pearson r > 0.7 | 노면/타이어성 |
+| `rpm_locked` | spike RPM이 ±50rpm 안에 3건 이상 모이는 대역에 속함 | 공진 / 부품 결함 의심 |
+| `shock` | spike 시점 ±5프레임 RPM 변화율 < 100rpm/s | 충격/접촉음 |
+| `steering` | spike 시점 ±5프레임 조향각 변화율 > 30°/s | 서스펜션/조향 계통 |
+| `unknown` | 위 어디에도 안 맞음 | 사람 검토 필요 |
 
-> **v0.2 계획**: 위 5종 패턴의 자동 분류, RPM-주파수 / 속도-주파수 상관계수 산출, 의심 구간 확대 PNG. 도메인 전문가의 실차 검증 데이터가 누적되면 휴리스틱을 코드화 예정.
+판정 우선순위(높은 → 낮음): `rpm_locked` > `steering` > `shock` > `engine_order` > `road` > `unknown`. 한 spike는 하나의 분류만 받습니다.
+
+> **임계값은 v0.2 초기치이며 도메인 검증으로 보정 권장.** [noise_report.py:22-28](scripts/noise_report.py)의 상수 5개를 직접 수정할 수 있습니다.
 
 ### STEP 5. 리포트 출력
 
 ```
 report_<ts>/
-├── INDEX.md                # 여러 take 일괄 처리 시 종합 인덱스
+├── INDEX.md                       # 여러 take 일괄 + 분류별 카운트 + RPM 락 대역
 └── <take_name>/
-    ├── report.md           # take별 의심 구간 표 (시각/peak Hz/RPM/속도/기어)
-    └── overview.png        # 4단 패널 (스펙트로그램 0~500Hz / RPM / 속도 / RMS)
+    ├── report.md                  # 의심 구간 표 (분류 포함) + 상관 분석 표
+    ├── overview.png               # 4단 패널 (스펙트로그램 / RPM / 속도 / RMS)
+    ├── correlations.csv           # RPM↔peak / speed↔peak / RPM↔RMS / speed↔RMS Pearson r
+    └── candidate_<1..5>.png       # spike 상위 5건 ±2초 확대 (스펙트로그램+RPM+RMS+분류 라벨)
 ```
 
 ## 리포트 예시 구조
