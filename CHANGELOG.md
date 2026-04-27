@@ -5,6 +5,14 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)을 따르며,
 버전 관리는 [Semantic Versioning](https://semver.org/lang/ko/)을 따릅니다.
 
+## [0.6.1](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.6.0...v0.6.1) (2026-04-27)
+
+
+### CI
+
+* Add workflow_dispatch to release-please for manual retry ([b16e19f](https://github.com/gaebalai/gaebalai-marketplace/commit/b16e19f48b27ba02fbd4a34cbd51ff38d69232af))
+* Pin release-please bootstrap-sha to v0.6.0 to scope analysis after migration ([96b432a](https://github.com/gaebalai/gaebalai-marketplace/commit/96b432a3534eaa6ab921a6e006d45e0660842e87))
+
 ## [Unreleased]
 
 ### Planned
