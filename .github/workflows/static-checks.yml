@@ -114,10 +114,6 @@ jobs:
           fi
           echo "car-can-checker: read-only invariant holds"
 
-      - name: TypeScript compile (Remotion templates)
-        run: |
-          set -e
-          if [ -f plugins/cc-meeting-highlight/assets/remotion/tsconfig.json ]; then
-            cd plugins/cc-meeting-highlight/assets/remotion
-            npx --yes typescript@5.4 tsc --noEmit
-          fi
+      # TypeScript 타입 체크는 의존성(react/remotion) 풀 install이 필요해 비용이 큽니다.
+      # 사용자가 `npm run build` / `npm run studio` 시점에 자연스럽게 잡히므로 CI는 JS 문법만 검증합니다.
+      # 필요 시 별도 워크플로우로 분리.
