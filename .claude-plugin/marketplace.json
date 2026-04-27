@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "gaebalai-marketplace",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Claude Code 생산성 플러그인 모음 — by gaebalai",
   "owner": {
     "name": "Jaewoo Kim",
@@ -12,7 +12,7 @@
     {
       "name": "car-can-checker",
       "description": "자동차 OBD2/CAN 진단 풀스택 파이프라인. 라즈베리파이 부트스트랩, CAN 로그에서 RPM/차속/조향각/기어 신호 자동 역엔지니어링, 마이크 FFT + CAN 동시 기록 PWA 스캐폴딩, 이상음 후보 자동 탐지 리포트까지. 4개 스킬 + 1개 오케스트레이터 에이전트. 읽기 전용(ECU write 차단).",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./plugins/car-can-checker",
       "category": "automotive",
       "tags": [

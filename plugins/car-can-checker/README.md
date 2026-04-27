@@ -84,10 +84,10 @@ PWA 스캐폴딩 + mkcert HTTPS         3. car-noise-pwa-builder
 
 이 플러그인은 다음을 **설계상 보장**합니다.
 
-- **읽기 전용** — ECU 쓰기 명령(UDS write, diagnostic write) 미구현 / 차단
-- **LAN 한정** — 차량 연결 Pi를 인터넷에 직접 노출 금지
+- **읽기 전용** — ECU 쓰기 명령(UDS write, diagnostic write) 미구현. python-can `bus.send()` 호출 자체가 코드에 없음
+- **LAN 한정** — `pi_server.py`가 기본적으로 LAN IP에만 바인딩하고 WebSocket Origin을 `https://{PI_HOST}:8443`으로 화이트리스트
 - **사용자 확인 필수** — mkcert 로컬 CA 신뢰, 패키지 sudo 설치, CAN 신호 매핑 확정은 자동화하지 않음
-- **신뢰도 95% 미만 신호는 PWA에 자동 반영 안 함** — 사람 검증 후 채택
+- **신호 매핑은 사람 검증 후 채택** — `can-signal-hunter`의 자동 추정은 휴리스틱 기반. 4단 검증 패널(`signals.png`)을 사용자가 보고 명시적으로 PWA에 반영
 
 리포트 결과는 **점검 후보 가이드**일 뿐 진단 확정 도구가 아닙니다. 차량 매뉴얼·실차 검증 없이 ECU 쓰기 명령에 절대 사용 금지.
 

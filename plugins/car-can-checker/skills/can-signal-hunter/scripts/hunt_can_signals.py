@@ -134,6 +134,99 @@ def classify_candidates(stats: pd.DataFrame) -> list[dict]:
     return candidates
 
 
+def write_dbc(candidates: list[dict], out_path: Path) -> bool:
+    """Top 후보들을 cantools DBC로 dump.
+
+    분류별 우선순위: 같은 ID에 RPM_or_SPEED 후보 둘이 있으면 score 1위를 RPM,
+    2위를 SPEED. STEERING/GEAR는 ID별 score 1위만. **추정값**이므로 사용 전 검증 필수.
+    """
+    try:
+        import cantools  # noqa: F401
+        from cantools.database.can import Database, Message, Signal
+    except ImportError:
+        print("[!] cantools 미설치 — DBC 작성 건너뜀 (pip install cantools)", file=sys.stderr)
+        return False
+
+    presets = {
+        "RPM":      {"scale": 0.25, "offset": 0, "unit": "rpm",  "is_signed": False},
+        "SPEED":    {"scale": 0.01, "offset": 0, "unit": "km/h", "is_signed": False},
+        "STEERING": {"scale": 0.1,  "offset": 0, "unit": "deg",  "is_signed": True},
+        "GEAR":     {"scale": 1,    "offset": 0, "unit": "",     "is_signed": False},
+    }
+
+    by_id: dict[int, list[dict]] = {}
+    for c in candidates:
+        cid = int(c["id"], 0)
+        by_id.setdefault(cid, []).append(c)
+
+    db = Database()
+    for cid, group in by_id.items():
+        signals: list = []
+        rpm_speed = sorted(
+            (c for c in group if c["guess"] == "RPM_or_SPEED"),
+            key=lambda x: -x["score"],
+        )
+        for i, c in enumerate(rpm_speed[:2]):
+            name = "RPM" if i == 0 else "SPEED"
+            p = presets[name]
+            signals.append(Signal(
+                name=name,
+                start_bit=c["byte"] * 8 + 7,  # big_endian: MSB of given byte
+                length=c["width"],
+                byte_order="big_endian",
+                is_signed=p["is_signed"],
+                scale=p["scale"],
+                offset=p["offset"],
+                unit=p["unit"],
+            ))
+        for guess in ("STEERING", "GEAR"):
+            top = max(
+                (c for c in group if c["guess"] == guess),
+                key=lambda x: x["score"],
+                default=None,
+            )
+            if top is None:
+                continue
+            p = presets[guess]
+            if guess == "STEERING":
+                signals.append(Signal(
+                    name="STEERING",
+                    start_bit=top["byte"] * 8 + 7,
+                    length=top["width"],
+                    byte_order="big_endian",
+                    is_signed=True,
+                    scale=p["scale"],
+                    offset=p["offset"],
+                    unit=p["unit"],
+                ))
+            else:  # GEAR — 1바이트 uint
+                signals.append(Signal(
+                    name="GEAR",
+                    start_bit=top["byte"] * 8,
+                    length=top["width"],
+                    byte_order="little_endian",
+                    is_signed=False,
+                    scale=p["scale"],
+                    offset=p["offset"],
+                    unit=p["unit"],
+                ))
+
+        if signals:
+            db.messages.append(Message(
+                frame_id=cid,
+                name=f"GUESS_{cid:03X}",
+                length=8,
+                signals=signals,
+                comment="auto-detected by can-signal-hunter — heuristic, verify before use",
+            ))
+
+    if not db.messages:
+        return False
+    db.refresh()
+    out_path.write_text(db.as_dbc_string(), encoding="utf-8")
+    return True
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("log", type=Path)
@@ -158,6 +251,10 @@ def main():
         cand_df = cand_df.sort_values(["guess", "score"], ascending=[True, False])
         cand_df.to_csv(args.out / "candidates.csv", index=False)
 
+    dbc_path = args.out / "guess.dbc"
+    if write_dbc(candidates, dbc_path):
+        print(f"[*] wrote {dbc_path}", file=sys.stderr)
+
     summary = ["# CAN Signal Hunter — Summary", ""]
     summary.append(f"- frames: {len(df)}")
     summary.append(f"- unique IDs: {df['id'].nunique()}")
@@ -174,6 +271,11 @@ def main():
             summary.append(
                 f"| {c['guess']} | {c['id']} | {c['byte']} | {c['width']} | {c['endian']} | {c['score']} | {c['hz']} |"
             )
+    if dbc_path.exists():
+        summary.append("")
+        summary.append("## DBC")
+        summary.append("")
+        summary.append("`guess.dbc` 자동 생성됨 — 휴리스틱 기반 추정. 실차 검증 전에 ECU 쓰기 명령에 사용 금지.")
     (args.out / "summary.md").write_text("\n".join(summary), encoding="utf-8")
     print(f"[*] wrote {args.out}/summary.md", file=sys.stderr)
 

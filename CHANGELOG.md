@@ -12,6 +12,37 @@
 - 기존 `gaebalai/cc-roundtable` 리포의 `.claude-plugin/marketplace.json` 정리 (마켓플레이스 통합 안내)
 - cc-meeting-highlight 실사용 회의 1건으로 dogfooding (mlx-whisper 모델 변형, 자막 길이 가이드 검증)
 - car-can-checker 실차량 1건으로 dogfooding (CAN 신호 후보 정확도, PWA 마이크 ZIP 워크플로우, 이상음 휴리스틱 검증)
+- car-noise-report v0.2: 5종 휴리스틱 분류 (회전성/노면성/공진/충격/조향계통), RPM-주파수·속도-주파수 상관 산출, 의심 구간 확대 PNG
+
+## [0.4.1] - 2026-04-27
+
+내부 코드 리뷰로 발견된 SKILL.md 약속과 실제 코드의 미스매치를 동기화. 보안 약속을 코드 레벨에서 강화.
+
+### Added
+- **`can-signal-hunter`**: cantools 기반 `guess.dbc` 자동 생성 — RPM/SPEED/STEERING/GEAR 카테고리별 top-score 후보를 빅엔디안 DBC Signal로 변환 ([hunt_can_signals.py:write_dbc](plugins/car-can-checker/skills/can-signal-hunter/scripts/hunt_can_signals.py))
+- **`car-noise-pwa-builder`**: [`templates/certs/README.md`](plugins/car-can-checker/skills/car-noise-pwa-builder/templates/certs/README.md) — mkcert 발급 가이드 (Pi 빌드, 로컬 CA, 스마트폰 신뢰, 보안 주의)
+- **`raspi-can-bootstrap`**: bootstrap.sh에 mkcert Go 소스 빌드 추가 (`golang-go` apt 설치 + `go install filippo.io/mkcert@latest`)
+
+### Changed
+- **`pi_server.py` 보안 강화**:
+  - 기본 바인딩 `0.0.0.0` → `PI_HOST` (LAN IP) — `HOST` 환경변수로 덮어쓰기 가능
+  - WebSocket Origin 화이트리스트 (기본 `https://{PI_HOST}:8443`) — `ALLOWED_ORIGIN` 환경변수
+  - SSL 컨텍스트 `Purpose.CLIENT_AUTH` → `PROTOCOL_TLS_SERVER` (의도 명확화)
+  - 인증서 누락 시 명시적 SystemExit + mkcert 가이드 안내
+  - `asyncio.get_event_loop()` deprecation 제거, `can.Notifier(loop=)` 인자 제거
+- **`car-noise-report` SKILL.md**: 5종 휴리스틱 분류 약속을 v0.2 계획으로 이동, 현재 v0.1은 "RMS 상위 1% spike 탐지 + 메타데이터 표"로 정직하게 표기. `candidate_<n>.png` / `correlations.csv` 출력 명세 삭제 (v0.2 예정)
+- **`car-noise-pwa-builder` SKILL.md**:
+  - 산출 구조에서 `pi/server.py` → `pi_server.py`로 정정 (실제 파일명과 일치)
+  - `icon-192.png` 자리표시자 항목 삭제 — 사용자가 별도 추가하도록 안내
+  - STEP 5 실행 예시에 `HOST` / `PORT` / `ALLOWED_ORIGIN` 환경변수 사용법 추가
+- **`raspi-can-bootstrap` SKILL.md**: 미사용 `--adapter` / `--can-dev` 인자 삭제, MCP2515 SPI 모듈은 별도 처리 필요함을 명시
+- **`bootstrap.sh`**: 무시되던 `ADAPTER` / `CAN_DEV` 변수 + 옵션 제거. `--bitrate`만 유지
+- **플러그인 README**: "신뢰도 95% 미만 자동 반영 안 함" 문구 삭제 — 실제 구현은 분산 임계값 기반이고 95% 게이트는 코드에 없음. "사람 검증 후 채택" 약속으로 정정
+- **`manifest.webmanifest`**: 존재하지 않는 `icon-192.png` 참조 삭제
+
+### Fixed
+- 정적 검증 (`bash -n`, `py_compile`, `jq empty`) 모두 통과
+- 토큰 치환 후 pi_server.py 컴파일 통과
 
 ## [0.4.0] - 2026-04-27
 
@@ -105,7 +136,8 @@
   추후 호환성 패치가 필요할 수 있습니다 (0.1.x 시리즈에서 흡수 예정)
 - 안정화 후 `1.0.0`으로 메이저 승격 예정
 
-[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.1
 [0.4.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.0
 [0.3.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.3.0
 [0.2.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.2.0

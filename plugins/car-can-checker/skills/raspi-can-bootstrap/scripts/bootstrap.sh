@@ -2,16 +2,12 @@
 # raspi-can-bootstrap — Pi 4/5/Zero 2W에 OBD2/CAN 진단 환경 + Claude Code 설치
 set -euo pipefail
 
-ADAPTER="auto"
 BITRATE="500000"
-CAN_DEV="/dev/serial/by-id/usb-CANable*"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --adapter)  ADAPTER="$2"; shift 2;;
     --bitrate)  BITRATE="$2"; shift 2;;
-    --can-dev)  CAN_DEV="$2"; shift 2;;
-    *) echo "unknown arg: $1" >&2; exit 1;;
+    *) echo "unknown arg: $1 (지원: --bitrate)" >&2; exit 1;;
   esac
 done
 
@@ -99,7 +95,24 @@ fi
 "$VENV/bin/pip" install --upgrade pip
 "$VENV/bin/pip" install python-can cantools aiohttp numpy pandas matplotlib
 
-# ---------- 9. 검증 ----------
+# ---------- 9. mkcert (PWA HTTPS 로컬 CA용) ----------
+if ! command -v mkcert >/dev/null; then
+  log "mkcert 설치 (Go 소스 빌드)"
+  $SUDO apt-get install -y golang-go
+  GO_BIN="$HOME/go/bin"
+  mkdir -p "$GO_BIN"
+  GOBIN="$GO_BIN" go install filippo.io/mkcert@latest || \
+    log "mkcert 빌드 실패 — Go 버전이 낮을 수 있음. 'go version' 확인 후 수동 설치"
+  if ! grep -q "$GO_BIN" <<<"${PATH:-}"; then
+    if ! grep -q 'go/bin' "$HOME/.bashrc" 2>/dev/null; then
+      echo "export PATH=\"\$PATH:$GO_BIN\"" >> "$HOME/.bashrc"
+    fi
+    export PATH="$PATH:$GO_BIN"
+  fi
+fi
+log "mkcert: $(command -v mkcert 2>/dev/null || echo '경로에 추가 안 됨 — 새 셸을 열어 사용')"
+
+# ---------- 10. 검증 ----------
 log "검증 — can0 인터페이스 상태"
 ip -s link show can0 || log "can0 미생성 — 차량/어댑터 연결 후 'sudo systemctl start slcan-attach.service'"
 
