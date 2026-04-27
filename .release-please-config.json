@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "simple",
+  "include-component-in-tag": false,
+  "include-v-in-tag": true,
+  "changelog-path": "CHANGELOG.md",
+  "packages": {
+    ".": {
+      "package-name": "gaebalai-marketplace",
+      "release-type": "simple",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/marketplace.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
+    "plugins/car-can-checker": {
+      "package-name": "car-can-checker",
+      "release-type": "simple",
+      "component": "car-can-checker",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
+    "plugins/cc-meeting-highlight": {
+      "package-name": "cc-meeting-highlight",
+      "release-type": "simple",
+      "component": "cc-meeting-highlight",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
+    "plugins/cc-roundtable": {
+      "package-name": "cc-roundtable",
+      "release-type": "simple",
+      "component": "cc-roundtable",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
+    "plugins/empirical-prompt-tuning": {
+      "package-name": "empirical-prompt-tuning",
+      "release-type": "simple",
+      "component": "empirical-prompt-tuning",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    }
+  },
+  "plugins": ["sentence-case"],
+  "changelog-sections": [
+    { "type": "feat", "section": "Features" },
+    { "type": "fix", "section": "Bug Fixes" },
+    { "type": "perf", "section": "Performance" },
+    { "type": "refactor", "section": "Refactor" },
+    { "type": "docs", "section": "Documentation" },
+    { "type": "ci", "section": "CI" },
+    { "type": "chore", "section": "Chores", "hidden": true },
+    { "type": "test", "section": "Tests", "hidden": true }
+  ]
+}

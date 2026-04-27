@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Phase 5: highlights.json을 읽어 ffmpeg로 클립 잘라내기 (CFR 30fps 재인코딩)
 #
+# 플랫폼: macOS (`stat -f %m` 사용). Linux 이식은 `stat -c %Y` 분기 추가 필요.
+#
 # 사용법:
 #   bash 50_cut_clips.sh
 #   FORCE=1 bash 50_cut_clips.sh   # 캐시 무시하고 전체 재생성
@@ -88,6 +90,7 @@ for ((i = 0; i < clip_count; i++)); do
     log "잘라내기 [${id}/${clip_count}]: ${start}s → ${end}s (${duration}s)"
 
     # ffmpeg: -ss 입력 측 + -to 정확 컷, libx264 CFR 30fps, AAC 128k
+    # ffmpeg 5.1+에서 -vsync 대신 -fps_mode 사용
     ffmpeg -hide_banner -loglevel warning -y \
         -ss "${start}" \
         -to "${end}" \
@@ -96,7 +99,7 @@ for ((i = 0; i < clip_count; i++)); do
         -preset medium \
         -crf 20 \
         -r 30 \
-        -vsync cfr \
+        -fps_mode cfr \
         -pix_fmt yuv420p \
         -c:a aac \
         -b:a 128k \

@@ -13,6 +13,30 @@
 - cc-meeting-highlight 실사용 회의 1건으로 dogfooding (mlx-whisper 모델 변형, 자막 길이 가이드 검증)
 - car-can-checker 실차량 1건으로 dogfooding (5종 휴리스틱 임계값 보정, RPM 락 대역 검출 정확도)
 
+## [0.6.0] - 2026-04-27
+
+전 플러그인 본격 검증 + 릴리즈 자동화 + 라이선스 정리.
+
+### Added
+- **release-please 자동화** ([.github/workflows/release-please.yml](.github/workflows/release-please.yml)) — Conventional Commits 기반으로 main push 시 릴리즈 PR 자동 생성. PR 머지 한 번으로 git tag + GitHub release + CHANGELOG + 모든 plugin.json/marketplace.json `version` 자동 갱신. 더 이상 수동 `gh release create` 불필요
+  - `.release-please-config.json` — 5개 패키지(루트 + plugin 4개) 독립 버전 관리
+  - `.release-please-manifest.json` — 현재 버전 매니페스트
+- **[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)** — 모든 플러그인의 외부 의존성 라이선스 명시 (Remotion, python-can LGPL, mlx-whisper, Noto Sans KR 등). 회사 환경 도입 시 검토 필요한 항목 강조
+- CI에 release-please 설정 검증 + manifest↔marketplace plugin set 동기화 invariant 추가
+
+### Changed (cc-meeting-highlight v0.1.0 → v0.1.1)
+- **`50_cut_clips.sh` `-vsync cfr` → `-fps_mode cfr`** — ffmpeg 5.1+ deprecation 정리
+- **`50_cut_clips.sh` 헤더에 macOS 전용 명시** — `stat -f %m` 사용 표기
+- **`bootstrap.sh` npm install 자동 실행 → 사용자 동의 후 실행** — 기본은 안내만, `INSTALL_NPM=1`로 활성화. 권한 요구 작업의 자동화 정도를 사용자 통제 하에 둠
+- **`highlights.schema.json` caption/subCaption 길이 설명 추가** — SKILL.md 권장(18/35자) vs schema hard limit(30/50자) 차이 명시. validator는 hard limit으로, 가이드는 권장값으로
+
+### Reviewed (no changes needed)
+- **`cc-roundtable` 일관성 점검 통과** — references 3개가 SKILL.md에서 정확히 참조되고 Phase 0-4 / Devil's Advocate / 소수 의견 체크 같은 핵심 개념이 references에 일관되게 등장. 미스매치 없음
+- **`cc-meeting-highlight` 코드/약속 매칭 통과** — `car-can-checker`에서 발견된 패턴(미구현 약속, 0.0.0.0 바인딩, 미사용 인자, 파일명 불일치)이 여기에는 없음. 외부 API write도 없음
+
+### Documentation
+- 루트 README: 운영자 섹션에 release-please 안내, third-party 라이선스 안내 추가
+
 ## [0.5.0] - 2026-04-27
 
 마켓플레이스 인프라 정비 + `car-can-checker` v0.2.0 (5종 휴리스틱 분류 구현).
@@ -166,7 +190,8 @@
   추후 호환성 패치가 필요할 수 있습니다 (0.1.x 시리즈에서 흡수 예정)
 - 안정화 후 `1.0.0`으로 메이저 승격 예정
 
-[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/gaebalai/gaebalai-marketplace/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.6.0
 [0.5.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.5.0
 [0.4.1]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.1
 [0.4.0]: https://github.com/gaebalai/gaebalai-marketplace/releases/tag/v0.4.0

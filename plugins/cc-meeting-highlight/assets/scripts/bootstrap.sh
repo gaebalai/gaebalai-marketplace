@@ -68,11 +68,17 @@ if [[ ! -f "${TARGET}/.venv/bin/python" ]]; then
     fi
 fi
 
-# Remotion npm install (선택, 권한 문제로 사용자 동의 필요할 수 있음)
+# Remotion npm install — 기본은 안내만, INSTALL_NPM=1로 활성화
 if command -v npm >/dev/null; then
     if [[ ! -d "${TARGET}/remotion/node_modules" ]]; then
-        log "npm install 실행 (meeting_rec/remotion)"
-        ( cd "${TARGET}/remotion" && npm install )
+        if [[ "${INSTALL_NPM:-0}" == "1" ]]; then
+            log "npm install 실행 (meeting_rec/remotion) — INSTALL_NPM=1"
+            ( cd "${TARGET}/remotion" && npm install )
+        else
+            warn "Remotion 의존성을 설치하려면 다음 중 하나를 실행하세요:"
+            warn "  INSTALL_NPM=1 bash bootstrap.sh   # 이 스크립트로 자동 설치"
+            warn "  cd ${TARGET}/remotion && npm install   # 수동 설치"
+        fi
     fi
 else
     warn "Node.js가 없습니다. 'brew install node' 후 다음을 수동 실행:"

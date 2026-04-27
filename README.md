@@ -56,7 +56,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 | 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 | 예시 |
 |---|---|---|---|---|---|
 | [`car-can-checker`](plugins/car-can-checker/) | 모든 플랫폼 + Raspberry Pi | automotive | 자동차 OBD2/CAN 진단 풀스택 — Pi 부트스트랩 → 신호 역엔지니어링(+DBC 자동) → 마이크 + CAN PWA → 5종 휴리스틱 이상음 리포트 | 0.2.0 | [예시](examples/car-can-checker.md) |
-| [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.0 | [예시](examples/cc-meeting-highlight.md) |
+| [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.1 | [예시](examples/cc-meeting-highlight.md) |
 | [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 | [예시](examples/cc-roundtable.md) |
 | [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 | [예시](examples/empirical-prompt-tuning.md) |
 
@@ -239,11 +239,27 @@ gaebalai-marketplace/                          # 이 리포지터리
 2. `plugins/<plugin-name>/.claude-plugin/plugin.json` 작성 (필수: `name`, `description`, `version`)
 3. 같은 디렉터리에 `skills/`, `commands/`, `agents/`, `hooks/` 등 표준 Claude Code 자원 배치
 4. 루트 `.claude-plugin/marketplace.json`의 `plugins` 배열에 항목 추가
-5. 커밋 후 푸시 — 사용자는 `/plugin marketplace update gaebalai-marketplace`로 갱신
+5. `.release-please-manifest.json`에 `"plugins/<plugin-name>": "0.1.0"` 추가, `.release-please-config.json`의 `packages`에 항목 추가
+6. **Conventional Commits**로 커밋 (`feat:` / `fix:` / `docs:` 등) 후 푸시 — release-please가 자동으로 PR을 생성합니다
+
+### 자동 릴리즈 (release-please)
+
+[.github/workflows/release-please.yml](.github/workflows/release-please.yml)이 main 브랜치 push마다 다음을 자동 처리합니다.
+
+- conventional-commits 분석 → semver bump 결정
+- CHANGELOG.md 자동 갱신 (per-plugin 섹션 분리)
+- `.claude-plugin/marketplace.json` + 각 plugin.json의 `version` 필드 자동 갱신
+- 릴리즈 PR 생성. PR을 머지하면 git tag + GitHub release가 자동으로 만들어짐
+
+수동 `gh release create`는 더 이상 필요 없습니다 (PR 머지 한 번으로 끝).
 
 ### GitHub 리포지터리 이름
 
 `/plugin marketplace add gaebalai/gaebalai-marketplace` 형식으로 사용하려면 GitHub 리포 이름이 **반드시 `gaebalai-marketplace`** 여야 합니다. 다른 이름이라면 `/plugin marketplace add owner/<actual-name>`을 안내해야 합니다.
+
+### Third-party 라이선스
+
+플러그인이 사용하는 외부 의존성(Remotion, python-can, mlx-whisper, 폰트 등)의 라이선스는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 참고. 회사 환경 도입 시 특히 **Remotion**(cc-meeting-highlight)과 **python-can LGPL**(car-can-checker)에 주의.
 
 ---
 

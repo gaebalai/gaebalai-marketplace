@@ -25,7 +25,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get update -y && sudo apt-get install -y jq
 
-      - name: JSON validation (marketplace + plugin manifests + schemas)
+      - name: JSON validation (marketplace + plugin manifests + schemas + release-please)
         run: |
           set -e
           echo "::group::marketplace.json"
@@ -43,6 +43,32 @@ jobs:
             jq empty "$f"
             echo "::endgroup::"
           done
+
+          if [ -f .release-please-config.json ]; then
+            echo "::group::.release-please-config.json"
+            jq empty .release-please-config.json
+            echo "::endgroup::"
+          fi
+
+          if [ -f .release-please-manifest.json ]; then
+            echo "::group::.release-please-manifest.json"
+            jq empty .release-please-manifest.json
+            echo "::endgroup::"
+          fi
+
+          # 매니페스트와 marketplace.json의 plugin 목록 일치 검증
+          if [ -f .release-please-manifest.json ]; then
+            echo "::group::manifest ↔ marketplace plugin set sync"
+            mp_plugins=$(jq -r '.plugins[].name' .claude-plugin/marketplace.json | sort)
+            rp_plugins=$(jq -r 'keys | .[] | select(. != ".")' .release-please-manifest.json \
+              | sed 's|^plugins/||' | sort)
+            diff <(echo "$mp_plugins") <(echo "$rp_plugins") || {
+              echo "::error::marketplace.json plugins mismatch with .release-please-manifest.json"
+              exit 1
+            }
+            echo "OK"
+            echo "::endgroup::"
+          fi
 
       - name: Bash syntax (bash -n)
         run: |
