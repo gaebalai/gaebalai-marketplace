@@ -5,6 +5,13 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)을 따르며,
 버전 관리는 [Semantic Versioning](https://semver.org/lang/ko/)을 따릅니다.
 
+## [0.7.0](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.6.1...v0.7.0) (2026-05-02)
+
+
+### Features
+
+* Add cc-jarvis plugin — JARVIS-style Stop hook for voice reports ([b43772e](https://github.com/gaebalai/gaebalai-marketplace/commit/b43772ea227b77b4e40533b394d635e52f895164))
+
 ## [0.6.1](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.6.0...v0.6.1) (2026-04-27)
 
 
