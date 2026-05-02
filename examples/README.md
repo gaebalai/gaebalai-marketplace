@@ -5,6 +5,7 @@
 | 플러그인 | 예시 |
 |---|---|
 | [`car-can-checker`](car-can-checker.md) | 풀 파이프라인 / CAN 로그만 분석 / PWA만 빌드 |
+| [`cc-jarvis`](cc-jarvis.md) | 응답 종료 자동 음성 보고 / 중단 시 분기 / `/jarvis-replay` 다시 듣기 |
 | [`cc-meeting-highlight`](cc-meeting-highlight.md) | 회의 mp4 → 60초 하이라이트 / 자막만 수정 / 30초 버전 |
 | [`cc-roundtable`](cc-roundtable.md) | 사이트 리뷰 / 기술 선정 / 사업 전략 |
 | [`empirical-prompt-tuning`](empirical-prompt-tuning.md) | SKILL 평가 / SlashCommand 평가 / hold-out 검증 |

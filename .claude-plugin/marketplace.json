@@ -33,6 +33,27 @@
       ]
     },
     {
+      "name": "cc-jarvis",
+      "description": "Claude Code 응답 종료 시 직전 트랜스크립트를 Haiku 4.5로 요약해 macOS 데스크톱 알림 + 한국어 음성(Yuna)으로 자비스(JARVIS)처럼 보고하는 Stop hook. 재귀 방지·ENABLED 토글·임시 파일 자동 정리 포함. macOS 전용.",
+      "version": "0.1.0",
+      "source": "./plugins/cc-jarvis",
+      "category": "productivity",
+      "tags": [
+        "stop-hook",
+        "jarvis",
+        "자비스",
+        "korean",
+        "voice",
+        "tts",
+        "say",
+        "macos",
+        "notification",
+        "session-summary",
+        "haiku",
+        "ambient"
+      ]
+    },
+    {
       "name": "cc-meeting-highlight",
       "description": "회의 녹화 mp4를 60초 하이라이트 영상으로 자동 압축하는 macOS Apple Silicon 전용 파이프라인. mlx-whisper로 받아쓰기, Claude Code LLM으로 토픽·하이라이트 선정, Remotion 4.x로 자막 합성. 한국어 회의 환경 기본 설정.",
       "version": "0.1.1",

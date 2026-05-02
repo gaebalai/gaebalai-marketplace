@@ -1,0 +1,27 @@
+{
+  "name": "cc-jarvis",
+  "description": "Claude Code 응답 종료 시 직전 트랜스크립트를 Haiku 4.5로 요약해 macOS 데스크톱 알림 + 한국어 음성(Yuna)으로 자비스(JARVIS)처럼 보고하는 Stop hook. 재귀 방지·ENABLED 토글·임시 파일 자동 정리 포함.",
+  "version": "0.1.0",
+  "author": {
+    "name": "gaebalai",
+    "url": "https://github.com/gaebalai"
+  },
+  "homepage": "https://github.com/gaebalai/gaebalai-marketplace/tree/main/plugins/cc-jarvis",
+  "repository": "https://github.com/gaebalai/gaebalai-marketplace",
+  "license": "MIT",
+  "platform": "darwin",
+  "keywords": [
+    "stop-hook",
+    "jarvis",
+    "tts",
+    "say",
+    "korean",
+    "macos",
+    "notification",
+    "session-summary",
+    "haiku",
+    "ambient"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "commands": "./commands/"
+}

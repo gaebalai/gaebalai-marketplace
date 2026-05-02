@@ -1,0 +1,24 @@
+#!/bin/bash
+# gs-config
+# 세션 요약 hook의 ON/OFF 를 토글한다.
+# PATH가 잡힌 위치(예: ~/bin)에 심볼릭 링크하여 사용.
+
+set -eu
+
+CONF="$HOME/.claude/hooks/session_summary.conf"
+
+if [ ! -f "$CONF" ]; then
+    echo "설정 파일을 찾을 수 없습니다: $CONF" >&2
+    exit 1
+fi
+
+if grep -q "^ENABLED=true" "$CONF"; then
+    sed -i "" "s/^ENABLED=true/ENABLED=false/" "$CONF"
+    echo "세션 요약 hook: OFF"
+elif grep -q "^ENABLED=false" "$CONF"; then
+    sed -i "" "s/^ENABLED=false/ENABLED=true/" "$CONF"
+    echo "세션 요약 hook: ON"
+else
+    echo "ENABLED 값이 true/false 가 아닙니다: $CONF" >&2
+    exit 1
+fi

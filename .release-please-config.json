@@ -31,6 +31,19 @@
         }
       ]
     },
+    "plugins/cc-jarvis": {
+      "package-name": "cc-jarvis",
+      "release-type": "simple",
+      "component": "cc-jarvis",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
     "plugins/cc-meeting-highlight": {
       "package-name": "cc-meeting-highlight",
       "release-type": "simple",
