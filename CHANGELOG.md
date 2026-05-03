@@ -5,6 +5,13 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)을 따르며,
 버전 관리는 [Semantic Versioning](https://semver.org/lang/ko/)을 따릅니다.
 
+## [0.8.0](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.7.0...v0.8.0) (2026-05-03)
+
+
+### Features
+
+* Add cc-security-scan plugin (security commands + output filter) ([c7d893f](https://github.com/gaebalai/gaebalai-marketplace/commit/c7d893fe0301f15a7d996257c08c9a91d2982f1e))
+
 ## [0.7.0](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.6.1...v0.7.0) (2026-05-02)
 
 
