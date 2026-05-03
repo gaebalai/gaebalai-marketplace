@@ -70,6 +70,19 @@
         }
       ]
     },
+    "plugins/cc-security-scan": {
+      "package-name": "cc-security-scan",
+      "release-type": "simple",
+      "component": "cc-security-scan",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    },
     "plugins/empirical-prompt-tuning": {
       "package-name": "empirical-prompt-tuning",
       "release-type": "simple",

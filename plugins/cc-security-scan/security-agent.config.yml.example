@@ -1,0 +1,31 @@
+# security-agent.config.yml
+# 이 파일을 security-agent.config.yml 로 복사해서 사용해 주세요
+# 인증 정보는 반드시 환경 변수로 주입해 주세요 (직접 작성 금지)
+
+target:
+  type: rest_api              # rest_api / web_app / graphql / grpc / db / auth_service
+  base_url: ${STAGING_URL}    # 환경 변수로 주입 (프로덕션 URL 기재 금지)
+  auth:
+    type: bearer_token        # bearer_token / basic / api_key / none
+    token: ${TEST_TOKEN}      # 환경 변수로 주입
+
+scope:
+  include:
+    - /api/**
+  exclude:
+    - /api/admin/**           # 관리 계열은 제외
+    - /health                 # 헬스 체크는 제외
+
+agents:
+  - owasp_top10               # 필수
+  # - auth_bypass             # 인증 기능이 있는 경우
+  # - injection               # DB · 외부 명령 실행이 있는 경우
+  # - prompt_injection        # LLM 기능이 있는 경우
+  # - multi_tenant            # 멀티 테넌트 구성인 경우
+  # - file_exposure           # 파일 업로드가 있는 경우
+
+schedule: manual              # pr_gate / weekly / release_gate / manual
+report:
+  format: file                # file / github_issue / slack
+  severity_gate: critical     # 이 심각도 이상에서 CI 를 중단 (critical / high / medium)
+  output_path: ./security-report.md

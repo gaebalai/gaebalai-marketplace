@@ -1,0 +1,20 @@
+# 보안 진단 출력물 (기밀 정보를 포함할 가능성이 있으므로 공개 금지)
+security-report.md
+security-report-full.md
+security-reports/
+coverage-report.yml
+coverage-report-full.yml
+
+# 프로젝트 고유 설정 (인증 정보를 포함할 가능성 있음)
+security-agent.config.yml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Claude Code 로컬 권한 설정 (개인 환경)
+.claude/settings.local.json

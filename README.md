@@ -1,11 +1,11 @@
 # gaebalai-marketplace
 
 [![Latest release](https://img.shields.io/github/v/release/gaebalai/gaebalai-marketplace?label=release)](https://github.com/gaebalai/gaebalai-marketplace/releases/latest)
-[![Plugins](https://img.shields.io/badge/plugins-5-blue)](#수록-플러그인)
+[![Plugins](https://img.shields.io/badge/plugins-6-blue)](#수록-플러그인)
 [![License](https://img.shields.io/github/license/gaebalai/gaebalai-marketplace)](LICENSE)
 [![CI](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml/badge.svg)](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml)
 
-> Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-jarvis`, `cc-meeting-highlight`, `cc-roundtable`, `empirical-prompt-tuning` 다섯 플러그인을 호스팅합니다.
+> Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-jarvis`, `cc-meeting-highlight`, `cc-roundtable`, `cc-security-scan`, `empirical-prompt-tuning` 여섯 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
 
@@ -24,6 +24,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 /plugin install cc-jarvis@gaebalai-marketplace              # macOS 전용
 /plugin install cc-meeting-highlight@gaebalai-marketplace   # macOS Apple Silicon 전용
 /plugin install cc-roundtable@gaebalai-marketplace
+/plugin install cc-security-scan@gaebalai-marketplace
 /plugin install empirical-prompt-tuning@gaebalai-marketplace
 ```
 
@@ -46,6 +47,11 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 이 결정을 다분야 전문가들과 토론으로 평가해줘
 이 사이트를 원탁회의 형식으로 리뷰해줘
 
+# cc-security-scan (수동 호출 전용 — disable-model-invocation)
+/security-review                           # PR · 차분(git diff) 정적 분석
+/full-scan                                 # 릴리스 전 전체 파일 + 의존성 CVE
+/security-scan                             # 스테이징 환경 런타임·HTTP 검증
+
 # empirical-prompt-tuning
 이 SKILL.md 평가해줘 (서브에이전트 3병렬로)
 ~/.claude/skills/conventional-changelog/SKILL.md 다른 AI한테 돌려봐줘
@@ -63,6 +69,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 | [`cc-jarvis`](plugins/cc-jarvis/) | macOS | productivity | Claude Code 응답 종료 시 직전 트랜스크립트를 Haiku 4.5로 요약 → 데스크톱 알림 + 한국어 음성(Yuna) 보고 (Stop hook) | 0.1.0 | [예시](examples/cc-jarvis.md) |
 | [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.1 | [예시](examples/cc-meeting-highlight.md) |
 | [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 | [예시](examples/cc-roundtable.md) |
+| [`cc-security-scan`](plugins/cc-security-scan/) | 모든 플랫폼 | security | 보안 슬래시 명령어 3종 — `/security-review` (PR 차분), `/full-scan` (전체 + CVE), `/security-scan` (스테이징 런타임). 출력 필터 hook + 40개 픽스처 테스트 동봉 | 1.0.0 | [예시](examples/cc-security-scan.md) |
 | [`empirical-prompt-tuning`](plugins/empirical-prompt-tuning/) | 모든 플랫폼 | productivity | 자기가 쓴 프롬프트의 재현성을 별도 AI에 백지 dispatch 시켜 객관 측정·정련하는 메타-스킬 | 0.1.0 | [예시](examples/empirical-prompt-tuning.md) |
 
 > 더 많은 트리거 예시는 [examples/](examples/README.md)를 참고.
@@ -186,6 +193,39 @@ Phase 4: 사용자 보고
 
 ---
 
+## cc-security-scan 요점
+
+> Claude Code 용 보안 슬래시 명령어 3종을 개발 사이클의 다른 타이밍에 분리 배치 — PR 리뷰 / 릴리스 전 / 배포 후. 모두 **`disable-model-invocation: true`** 라 모델이 자의로 발동하지 않고, 사용자가 명시적으로 `/명령어`를 쳐야 동작.
+
+| 타이밍 | 슬래시 | 대상 |
+| --- | --- | --- |
+| PR 생성 시 | `/security-review` | git diff 만 · 정적 분석 · 신뢰도 0.8↑만 보고(거짓 양성 필터링) |
+| 릴리스 전 | `/full-scan` | 전체 소스 + `npm audit`/`pip-audit`/`cargo audit`/`gitleaks` 병렬, 모노레포 대응 |
+| 배포 후 | `/security-scan` | 스테이징 서버에 HTTP 동적 테스트 (헤더, OWASP Top 10, JWT 혼동, 인젝션 등) |
+
+**보안 원칙**
+
+- `/security-scan` 은 **스테이징 환경 전용** — 프로덕션 URL (`prod`, `production`, `app.` 등) 은 `security-agent.config.yml` 에서 명시 허가가 없으면 거부
+- Critical 이상 발견은 즉시 보고하고 사람 승인 없이 자동 수정하지 않음
+- 결과에 PII / 인증 토큰이 섞이면 마스킹 후 기록
+- 출력은 `hooks/security-filter.sh` 로 Critical/High만 추려 8KB 캡
+
+**테스트 하니스** — `tests/security-skills/fixtures/` 에 40+ 픽스처(`vuln/safe/hard/attacker/no-comment/deep-chain/framework-bypass/infra-combo`) + 채점 기준(`expected.json`). `/full-scan tests/security-skills/fixtures` 로 자체 평가 가능.
+
+**커버리지** (3개 명령어 합산):
+
+| 영역 | 커버리지 |
+| --- | --- |
+| OWASP Top 10 베이스 | 약 65~70% |
+| 코드 패턴 (injection, XSS, hardcoded key) | 약 90% |
+| 의존성 CVE | 약 85% |
+| HTTP 설정 실수 | 약 75% |
+| 비즈니스 로직 · 인프라 | 침투 테스트 (수작업) 필요 |
+
+자세한 사전 요건·도입 절차·실행 정책은 [plugins/cc-security-scan/README.md](plugins/cc-security-scan/README.md) 와 [plugins/cc-security-scan/templates/security-skills-setup.md](plugins/cc-security-scan/templates/security-skills-setup.md) 를 참고.
+
+---
+
 ## empirical-prompt-tuning 요점
 
 > 내가 쓴 프롬프트는, 내가 평가할 수 없다.
@@ -258,6 +298,18 @@ gaebalai-marketplace/                          # 이 리포지터리
 │   │       └── start/
 │   │           ├── SKILL.md
 │   │           └── references/                # 토론 규칙·전문가 아키타입·출력 포맷
+│   ├── cc-security-scan/                      # 보안 슬래시 명령어 3종
+│   │   ├── .claude-plugin/plugin.json
+│   │   ├── README.md
+│   │   ├── commands/
+│   │   │   ├── security-review.md             # /security-review (PR 차분)
+│   │   │   ├── full-scan.md                   # /full-scan (전체 + CVE)
+│   │   │   └── security-scan.md               # /security-scan (스테이징 런타임)
+│   │   ├── hooks/security-filter.sh           # 출력 파이프 필터 (Critical/High, 8KB 캡)
+│   │   ├── rules/security.md                  # 글로벌 보안 룰
+│   │   ├── templates/                         # security-agent.config 템플릿 + 도입 가이드
+│   │   ├── docs/design.md
+│   │   └── tests/security-skills/             # 40+ 픽스처 + expected.json
 │   └── empirical-prompt-tuning/
 │       ├── .claude-plugin/plugin.json
 │       └── skills/
@@ -376,6 +428,7 @@ bash <repo>/plugins/cc-meeting-highlight/assets/scripts/bootstrap.sh
 /plugin uninstall cc-jarvis@gaebalai-marketplace
 /plugin uninstall cc-meeting-highlight@gaebalai-marketplace
 /plugin uninstall cc-roundtable@gaebalai-marketplace
+/plugin uninstall cc-security-scan@gaebalai-marketplace
 /plugin uninstall empirical-prompt-tuning@gaebalai-marketplace
 
 # 마켓플레이스 자체 제거

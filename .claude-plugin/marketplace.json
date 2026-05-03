@@ -94,6 +94,27 @@
       ]
     },
     {
+      "name": "cc-security-scan",
+      "description": "Claude Code용 보안 슬래시 명령어 3종 — /security-review (PR 차분 정적 분석), /full-scan (릴리스 전 전체 파일 + 의존성 CVE), /security-scan (스테이징 런타임·HTTP 검증). 출력은 hooks/security-filter.sh로 Critical/High만 8KB 캡. 모델 자동 발동 차단, 프로덕션 URL 거부, 스테이징 전용 강제. 40개 픽스처 테스트 하니스 동봉.",
+      "version": "1.0.0",
+      "source": "./plugins/cc-security-scan",
+      "category": "security",
+      "tags": [
+        "security",
+        "보안",
+        "scan",
+        "OWASP",
+        "vulnerability",
+        "static-analysis",
+        "diff-review",
+        "dependency-cve",
+        "runtime-test",
+        "korean",
+        "staging-only",
+        "pre-release"
+      ]
+    },
+    {
       "name": "empirical-prompt-tuning",
       "description": "사용자가 쓴 Claude Code Skill / SlashCommand / 프롬프트를 별도 AI에 백지 dispatch 시켜 재현성을 객관 측정하는 메타-스킬. 불명확점·재량 보완·재시도를 정성+정량 양면으로 수집해 1회 1테마로 정련.",
       "version": "0.1.0",

@@ -1,0 +1,78 @@
+{
+  "easy_vuln": {
+    "total": 6,
+    "files": [
+      { "file": "fixtures/vuln/nosql-injection.ts", "category": "injection" },
+      { "file": "fixtures/vuln/hardcoded-key.ts", "category": "hardcoded_secret", "count": 2 },
+      { "file": "fixtures/vuln/xss.tsx", "category": "xss" },
+      { "file": "fixtures/vuln/xss.tsx", "category": "code_execution" },
+      { "file": "fixtures/vuln/jwt-bypass.ts", "category": "auth_bypass", "count": 2 }
+    ],
+    "safe": [
+      { "file": "fixtures/safe/parameterized-query.ts", "expected": "no_finding" },
+      { "file": "fixtures/safe/env-auth.ts", "expected": "no_finding" }
+    ]
+  },
+  "hard_vuln": {
+    "total": 5,
+    "files": [
+      { "file": "fixtures/hard-vuln/fake-escape.ts", "category": "injection", "note": "이스케이프 완료된 것처럼 보이지만 템플릿 리터럴로 임베드하고 있다" },
+      { "file": "fixtures/hard-vuln/indirect-xss.tsx", "category": "xss", "note": "헬퍼 함수 경유 XSS" },
+      { "file": "fixtures/hard-vuln/ssrf.ts", "category": "ssrf" },
+      { "file": "fixtures/hard-vuln/pii-logging.ts", "category": "pii_logging" },
+      { "file": "fixtures/hard-vuln/authz-bypass.ts", "category": "authz_bypass" }
+    ],
+    "safe": [
+      { "file": "fixtures/hard-safe/sanitized-html.tsx", "expected": "no_finding", "note": "DOMPurify 완료" },
+      { "file": "fixtures/hard-safe/non-user-exec.ts", "expected": "no_finding", "note": "사용자 입력이 exec 에 전달되지 않는다" }
+    ]
+  },
+  "attacker_vuln": {
+    "total": 6,
+    "note": "단일 파일 분석에서는 놓치기 쉬운 패턴",
+    "files": [
+      {
+        "file": "fixtures/attacker/01-mass-assignment.ts",
+        "category": "mass_assignment",
+        "difficulty": "medium-hard",
+        "note": "name 밸리데이션 후에 전체 필드 spread"
+      },
+      {
+        "file": "fixtures/attacker/02-second-order-injection.ts",
+        "category": "second_order_injection",
+        "difficulty": "hard",
+        "note": "저장 시는 안전하지만 꺼내서 사용할 때에 재인젝션"
+      },
+      {
+        "file": "fixtures/attacker/03a-middleware.ts + 03b-analytics-route.ts",
+        "category": "cross_file_authz_bypass",
+        "difficulty": "very-hard",
+        "note": "2 파일을 합쳐야 비로소 취약성이 보인다. 단체로는 무해"
+      },
+      {
+        "file": "fixtures/attacker/04-open-redirect.ts",
+        "category": "open_redirect",
+        "difficulty": "medium",
+        "note": "OAuth 콜백 후의 state 파라미터 미검증"
+      },
+      {
+        "file": "fixtures/attacker/05-cors-credentials.ts",
+        "category": "cors_misconfiguration",
+        "difficulty": "hard",
+        "note": "Origin 반사 + Credentials:true 의 조합"
+      }
+    ],
+    "safe": [
+      {
+        "file": "fixtures/attacker-safe/safe-redirect.ts",
+        "expected": "no_finding",
+        "note": "allowlist 로 pathname 만 허가"
+      },
+      {
+        "file": "fixtures/attacker-safe/safe-cors.ts",
+        "expected": "no_finding",
+        "note": "Origin 화이트리스트 검증 완료"
+      }
+    ]
+  }
+}

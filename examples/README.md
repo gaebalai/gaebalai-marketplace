@@ -8,4 +8,5 @@
 | [`cc-jarvis`](cc-jarvis.md) | 응답 종료 자동 음성 보고 / 중단 시 분기 / `/jarvis-replay` 다시 듣기 |
 | [`cc-meeting-highlight`](cc-meeting-highlight.md) | 회의 mp4 → 60초 하이라이트 / 자막만 수정 / 30초 버전 |
 | [`cc-roundtable`](cc-roundtable.md) | 사이트 리뷰 / 기술 선정 / 사업 전략 |
+| [`cc-security-scan`](cc-security-scan.md) | PR 차분 보안 리뷰 / 릴리스 전 풀 스캔 / 스테이징 런타임 검증 |
 | [`empirical-prompt-tuning`](empirical-prompt-tuning.md) | SKILL 평가 / SlashCommand 평가 / hold-out 검증 |
