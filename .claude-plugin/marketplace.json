@@ -35,7 +35,7 @@
     {
       "name": "cc-jarvis",
       "description": "Claude Code 응답 종료 시 직전 트랜스크립트를 Haiku 4.5로 요약해 macOS 데스크톱 알림 + 한국어 음성(Yuna)으로 자비스(JARVIS)처럼 보고하는 Stop hook. 재귀 방지·ENABLED 토글·임시 파일 자동 정리 포함. macOS 전용.",
-      "version": "0.1.0",
+      "version": "0.3.0",
       "source": "./plugins/cc-jarvis",
       "category": "productivity",
       "tags": [
@@ -96,7 +96,7 @@
     {
       "name": "cc-security-scan",
       "description": "Claude Code용 보안 슬래시 명령어 3종 — /security-review (PR 차분 정적 분석), /full-scan (릴리스 전 전체 파일 + 의존성 CVE), /security-scan (스테이징 런타임·HTTP 검증). 출력은 hooks/security-filter.sh로 Critical/High만 8KB 캡. 모델 자동 발동 차단, 프로덕션 URL 거부, 스테이징 전용 강제. 40개 픽스처 테스트 하니스 동봉.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "source": "./plugins/cc-security-scan",
       "category": "security",
       "tags": [
