@@ -2,13 +2,29 @@
 
 Claude Code가 Markdown을 작성하는 순간,
 
-1. **일반 HTML**(플레인 스타일)
+1. **일반 HTML**(플레인 스타일 — macOS는 AppleGothic, Windows는 맑은 고딕을 우선 폰트로 사용)
 2. **팬시 HTML**(`claude -p`를 서브 프로세스로 실행하여 생성하는 인포그래픽 스타일 HTML)
 
 을 자동으로 `.html/` 디렉터리에 출력하고, 브라우저로 열어 주는 hook 스크립트입니다.
 **macOS**(Bash + AppleScript)와 **Windows**(PowerShell + WinForms) 양쪽을 지원합니다.
 
 매번 다이얼로그로 "HTML을 생성할까요?", "팬시도 만들까요?"를 물어보는 대화형 방식입니다.
+
+## 설치 (권장: gaebalai-marketplace)
+
+이 플러그인은 [gaebalai/gaebalai-marketplace](https://github.com/gaebalai/gaebalai-marketplace)에 등록되어 있어, Claude Code의 플러그인 시스템으로 한 줄에 설치할 수 있습니다. 별도의 `~/.claude/settings.json` 편집 / 스크립트 복사 / `chmod +x` 불필요.
+
+```
+# 1. 마켓플레이스 등록 (1회)
+/plugin marketplace add gaebalai/gaebalai-marketplace
+
+# 2. 플러그인 설치
+/plugin install cc-fancy-html-hook@gaebalai-marketplace
+```
+
+설치하면 [hooks/hooks.json](hooks/hooks.json)이 Claude Code의 `PostToolUse` (Write/Edit/MultiEdit)에 자동 연결되며, macOS에서는 `on-md-write.sh`, Windows에서는 `on-md-write.ps1`이 각각 호출됩니다.
+
+> Python `markdown` 패키지 설치는 별도로 필요합니다. 아래 [필요한 것](#필요한-것) 섹션을 참고하세요.
 
 ## 동작 개요
 
@@ -67,14 +83,16 @@ py -m pip install --user markdown
 > # 그리고 스크립트의 `python3` 호출부를 ~/.claude/venv/bin/python으로 바꿔주세요.
 > ```
 
-## 설치 방법
+## 수동 설치 (마켓플레이스를 쓰지 않는 경우)
+
+마켓플레이스를 쓰지 않고 hook을 직접 `~/.claude/`에 꽂고 싶을 때만 아래를 따르세요. 위의 [설치 (권장: gaebalai-marketplace)](#설치-권장-gaebalai-marketplace) 흐름이 더 단순하고 업데이트도 `/plugin update`로 자동입니다.
 
 ### macOS
 
 ```bash
-# 1. 저장소 clone
-git clone https://github.com/gaebalai/cc-fancy-html-hook.git
-cd cc-fancy-html-hook
+# 1. 저장소 clone (또는 gaebalai-marketplace clone 후 plugins/cc-fancy-html-hook으로 이동)
+git clone https://github.com/gaebalai/gaebalai-marketplace.git
+cd gaebalai-marketplace/plugins/cc-fancy-html-hook
 
 # 2. hook 스크립트를 ~/.claude/hooks/에 배치
 mkdir -p ~/.claude/hooks
@@ -106,8 +124,8 @@ chmod +x ~/.claude/hooks/on-md-write.sh
 
 ```powershell
 # 1. 저장소 clone
-git clone https://github.com/gaebalai/cc-fancy-html-hook.git
-cd cc-fancy-html-hook
+git clone https://github.com/gaebalai/gaebalai-marketplace.git
+cd gaebalai-marketplace\plugins\cc-fancy-html-hook
 
 # 2. hook 스크립트를 %USERPROFILE%\.claude\hooks\에 배치
 $hookDir = Join-Path $env:USERPROFILE '.claude\hooks'
@@ -161,17 +179,21 @@ WSL2에서는 macOS용 `on-md-write.sh`를 그대로 쓰되, 다이얼로그/브
 
 ```
 .
+├── .claude-plugin/
+│   └── plugin.json                # 마켓플레이스 매니페스트 (이름·버전·hooks 경로)
 ├── README.md
+├── LICENSE                        # MIT
 ├── hooks/
+│   ├── hooks.json                 # PostToolUse 자동 등록 정의 (sh + ps1 모두)
 │   ├── on-md-write.sh             # macOS / Linux용 본체 스크립트
 │   └── on-md-write.ps1            # Windows PowerShell용 본체 스크립트
-├── images/                         # 스크린샷 보관 폴더
-├── settings.example.json           # macOS용 hook 등록 예시
-└── settings.example.windows.json   # Windows용 hook 등록 예시
+├── settings.example.json           # macOS용 수동 hook 등록 예시
+└── settings.example.windows.json   # Windows용 수동 hook 등록 예시
 ```
 
 ## 보완 사항 / 주의점
 
+- **기본 폰트는 OS별로 분기.** 일반 HTML의 `<style>` 블록은 macOS에서 `AppleGothic, 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif` 순으로, Windows에서 `'Malgun Gothic', '맑은 고딕', 'Segoe UI', Tahoma, sans-serif` 순으로 폴백을 잡습니다. 다른 폰트로 바꾸고 싶으면 [hooks/on-md-write.sh:72](hooks/on-md-write.sh#L72) (macOS) 또는 [hooks/on-md-write.ps1:98](hooks/on-md-write.ps1#L98) (Windows)의 `font-family` 한 줄만 수정하세요. 팬시 HTML은 `claude -p`가 자유롭게 디자인하므로 이 설정의 영향을 받지 않습니다.
 - **코드 펜스 자동 제거.** `claude -p`의 출력은 종종 ```` ```html ... ``` ```` 펜스로 감싸져 나옵니다. 이 hook은 awk(macOS) / PowerShell(Windows)에서 첫 줄과 마지막 줄의 펜스를 후처리로 떼어냅니다. 그래도 가운데에 펜스가 박혀 나오는 경우가 있다면 프롬프트를 추가로 강화하세요.
 - **Markdown 본문은 stdin 전달.** `claude -p`의 인자에 본문을 끼워 넣으면 `ARG_MAX`를 넘기거나 `ps`로 본문이 노출될 위험이 있습니다. 두 스크립트 모두 stdin으로 전달합니다.
 - **백그라운드 실행 필수.** Claude Code의 hook은 동기 실행입니다. 팬시 HTML 생성은 수십 초 ~ 수 분 걸리므로, macOS는 Bash `&`, Windows는 `Start-Job`으로 분리해 부모 Claude Code가 멈추지 않게 합니다.
