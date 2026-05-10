@@ -5,6 +5,13 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/ko/1.1.0/)을 따르며,
 버전 관리는 [Semantic Versioning](https://semver.org/lang/ko/)을 따릅니다.
 
+## [0.9.1](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.9.0...v0.9.1) (2026-05-10)
+
+
+### Documentation
+
+* **cc-fancy-html-hook:** Refresh README for marketplace install + OS-specific font defaults ([304524c](https://github.com/gaebalai/gaebalai-marketplace/commit/304524cbb31bf8c6e8c11e609c0a4f991b0c7ada))
+
 ## [0.9.0](https://github.com/gaebalai/gaebalai-marketplace/compare/v0.8.0...v0.9.0) (2026-05-10)
 
 
