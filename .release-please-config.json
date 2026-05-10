@@ -36,6 +36,24 @@
         }
       ]
     },
+    "plugins/cc-fancy-html-hook": {
+      "package-name": "cc-fancy-html-hook",
+      "release-type": "simple",
+      "component": "cc-fancy-html-hook",
+      "bootstrap-sha": "4751e2fd8eb3fb3e178d90d211b7d321fb68234a",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": ".claude-plugin/plugin.json",
+          "jsonpath": "$.version"
+        },
+        {
+          "type": "json",
+          "path": ".claude-plugin/marketplace.json",
+          "jsonpath": "$.plugins[?(@.name=='cc-fancy-html-hook')].version"
+        }
+      ]
+    },
     "plugins/cc-jarvis": {
       "package-name": "cc-jarvis",
       "release-type": "simple",

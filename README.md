@@ -1,11 +1,11 @@
 # gaebalai-marketplace
 
 [![Latest release](https://img.shields.io/github/v/release/gaebalai/gaebalai-marketplace?label=release)](https://github.com/gaebalai/gaebalai-marketplace/releases/latest)
-[![Plugins](https://img.shields.io/badge/plugins-6-blue)](#수록-플러그인)
+[![Plugins](https://img.shields.io/badge/plugins-7-blue)](#수록-플러그인)
 [![License](https://img.shields.io/github/license/gaebalai/gaebalai-marketplace)](LICENSE)
 [![CI](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml/badge.svg)](https://github.com/gaebalai/gaebalai-marketplace/actions/workflows/static-checks.yml)
 
-> Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-jarvis`, `cc-meeting-highlight`, `cc-roundtable`, `cc-security-scan`, `empirical-prompt-tuning` 여섯 플러그인을 호스팅합니다.
+> Claude Code 플러그인 마켓플레이스. 현재 `car-can-checker`, `cc-fancy-html-hook`, `cc-jarvis`, `cc-meeting-highlight`, `cc-roundtable`, `cc-security-scan`, `empirical-prompt-tuning` 일곱 플러그인을 호스팅합니다.
 
 이 리포지터리는 Claude Code의 [플러그인 시스템](https://docs.claude.com/en/docs/claude-code/plugins)에서 곧바로 추가할 수 있는 **마켓플레이스** 형태로 구성되어 있습니다.
 
@@ -21,6 +21,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 
 # 2. 플러그인 설치 (필요한 것만, 또는 전부)
 /plugin install car-can-checker@gaebalai-marketplace
+/plugin install cc-fancy-html-hook@gaebalai-marketplace     # macOS + Windows
 /plugin install cc-jarvis@gaebalai-marketplace              # macOS 전용
 /plugin install cc-meeting-highlight@gaebalai-marketplace   # macOS Apple Silicon 전용
 /plugin install cc-roundtable@gaebalai-marketplace
@@ -35,6 +36,9 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 차 한번 굴리고 받은 데이터 분석해줘
 이 candump 로그에서 RPM ID 찾아줘
 차량 진단 PWA 만들어줘
+
+# cc-fancy-html-hook (설치만 하면 자동 동작 — .md를 Write/Edit할 때마다 다이얼로그)
+# "HTML 변환할까요?" → 일반 HTML / 팬시 HTML(인포그래픽 스타일) 자동 생성·브라우저 오픈
 
 # cc-jarvis (macOS 전용 — 설치만 하면 자동 동작, 별도 트리거 없음)
 # 매 응답이 끝날 때마다 데스크톱 알림 + Yuna 한국어 음성으로 작업 결과 보고
@@ -66,6 +70,7 @@ Claude Code 세션에서 마켓플레이스를 한 번 추가한 뒤, 원하는 
 | 플러그인 | 플랫폼 | 카테고리 | 설명 | 버전 | 예시 |
 |---|---|---|---|---|---|
 | [`car-can-checker`](plugins/car-can-checker/) | 모든 플랫폼 + Raspberry Pi | automotive | 자동차 OBD2/CAN 진단 풀스택 — Pi 부트스트랩 → 신호 역엔지니어링(+DBC 자동) → 마이크 + CAN PWA → 5종 휴리스틱 이상음 리포트 | 0.2.0 | [예시](examples/car-can-checker.md) |
+| [`cc-fancy-html-hook`](plugins/cc-fancy-html-hook/) | macOS + Windows | productivity | Claude Code가 .md를 Write/Edit하면 일반 HTML과 인포그래픽 스타일 '팬시 HTML'을 자동 생성·브라우저로 오픈 (PostToolUse hook + 백그라운드 `claude -p`) | 0.1.0 | [예시](examples/cc-fancy-html-hook.md) |
 | [`cc-jarvis`](plugins/cc-jarvis/) | macOS | productivity | Claude Code 응답 종료 시 직전 트랜스크립트를 Haiku 4.5로 요약 → 데스크톱 알림 + 한국어 음성(Yuna) 보고 (Stop hook) | 0.1.0 | [예시](examples/cc-jarvis.md) |
 | [`cc-meeting-highlight`](plugins/cc-meeting-highlight/) | macOS Apple Silicon | productivity | 회의 녹화 mp4 → 60초 하이라이트 영상 자동 생성 (mlx-whisper × Claude × Remotion) | 0.1.1 | [예시](examples/cc-meeting-highlight.md) |
 | [`cc-roundtable`](plugins/cc-roundtable/) | 모든 플랫폼 | productivity | 다분야 전문가를 동적으로 선정해 구조화된 토론으로 다각적 평가·제언을 정리 | 1.0.0 | [예시](examples/cc-roundtable.md) |
