@@ -1,7 +1,7 @@
 {
   "name": "cc-fancy-html-hook",
   "description": "Claude Code가 .md 파일을 Write/Edit하면 일반 HTML과 인포그래픽 스타일 '팬시 HTML'을 자동 생성해 브라우저로 띄우는 PostToolUse hook. python-markdown으로 일반본을 즉시, 백그라운드 `claude -p` 서브 프로세스로 팬시본을 생성. macOS(Bash + AppleScript)와 Windows(PowerShell + WinForms) 양쪽 지원.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "gaebalai",
     "url": "https://github.com/gaebalai"

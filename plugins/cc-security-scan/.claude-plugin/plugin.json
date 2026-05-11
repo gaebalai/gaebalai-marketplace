@@ -1,7 +1,7 @@
 {
   "name": "cc-security-scan",
   "description": "Claude Code용 보안 슬래시 명령어 3종 — /security-review (PR 차분 정적 분석), /full-scan (릴리스 전 전체 파일 + 의존성 CVE), /security-scan (스테이징 런타임·HTTP 검증). 출력은 hooks/security-filter.sh로 Critical/High만 8KB 캡. 모델 자동 발동 차단(disable-model-invocation), 프로덕션 URL 거부, 스테이징 전용 강제. 40개 픽스처 테스트 하니스 동봉.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": {
     "name": "gaebalai",
     "url": "https://github.com/gaebalai"
